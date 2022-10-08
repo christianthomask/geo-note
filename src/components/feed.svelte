@@ -1,7 +1,7 @@
 <script>
 
     import { initializeApp } from "firebase/app";
-    import { getDatabase, ref as fireRef, set } from "firebase/database";
+    import { getDatabase, ref as fireRef, set, push } from "firebase/database";
     import { onMount } from 'svelte';
 
     let loc
@@ -11,8 +11,8 @@
         loc = window.navigator;
     });
 
-    // TODO: Replace the following with your app's Firebase project configuration
-    // See: https://firebase.google.com/docs/web/learn-more#config-object
+    let posting = false;
+
     const firebaseConfig = {
         apiKey: "AIzaSyBbaLefwpOcEG1dewjTeXJroUDr7TCuNLU",
         authDomain: "geo-note-1c91e.firebaseapp.com",
@@ -42,26 +42,38 @@
         }
     }
 
-    async function submitPost() {
-        await loc.geolocation.getCurrentPosition(locationSuccess, () => {console.log('geolocation error')})
-        let post = document.getElementById('post').value
-        await set(fireRef(db, '/users'), {
-            post: {
-                user: 'Christian',
-                lat: lat,
-                lng: lng,
-                content: post
-            }
-
+    let getLocationPromise = () => {
+        return new Promise(function (resolve, reject) {
+            loc.geolocation.getCurrentPosition(
+                (position) => resolve(position),
+                (error) => reject(error)
+            );
         });
     }
 
-    async function locationSuccess(pos) {
-        console.log('run')
-        const crd = pos.coords
-        lat = crd.latitude
-        lng = crd.longitude
+
+    function submitPost() {
+        posting = true;
+        getLocationPromise()
+            .then((res) => {
+                // console.log('run')
+                const { coords } = res;
+                lat = coords.latitude
+                lng = coords.longitude
+                let post = document.getElementById('post').value
+                const postListRef = fireRef(db, '/posts');
+                const newPostRef = push(postListRef);
+                set(newPostRef, {
+                    user: 'Christian',
+                    lat: lat,
+                    lng: lng,
+                    content: post
+                });
+                posting = false;
+                togglePostState();
+            })
     }
+
 </script>
 
 <div class="relative bottom-0 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden">
@@ -91,6 +103,11 @@
                     Pin
                 </button>
             </div>
+        </div>
+    {/if}
+    {#if posting}
+        <div class="absolute top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
+            <p class="text-white">Posting...</p>
         </div>
     {/if}
 </div>
