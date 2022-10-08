@@ -10,7 +10,7 @@
 
         const apiKey = '3lyTBC440REMO3MblUAD';
 
-        const initialState = { lng: 139.753, lat: 35.6844, zoom: 14 };
+        const initialState = { lng: 0, lat: 0, zoom: 14 };
 
         map = new Map({
             container: mapContainer,
