@@ -13,9 +13,9 @@
         loc = window.navigator;
 
         onValue(postListRef, (snapshot) => {
-            console.log('post');
+            // console.log('post');
             posts.set(snapshot.val());
-            console.log(posts);
+            // console.log(posts);
         })
     });
 
@@ -104,18 +104,20 @@
     {#if feedExpandedState.state === 'feed'}
         <div class="w-full h-full flex flex-col gap-y-4 py-4">
             {#key $posts}
-                {#each Object.entries($posts) as [id, contents]}
-                    <div class="w-full h-fit p-2.5 flex gap-y-2.5 items-center">
-                        {#if contents.loading}
-                            <div class="absolute top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
-                                <p class="text-white">Loading...</p>
-                            </div>
-                        {/if}
-                        {#if !contents.loading}
-                            <p>{contents.user} pinned a note nearby!</p>
-                        {/if}
-                    </div>
-                {/each}
+                {#if $posts}
+                    {#each Object.entries($posts) as [id, contents]}
+                        <div class="w-full h-fit p-2.5 flex gap-y-2.5 items-center">
+                            {#if contents.loading}
+                                <div class="absolute top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
+                                    <p class="text-white">Loading...</p>
+                                </div>
+                            {/if}
+                            {#if !contents.loading}
+                                <p>{contents.user} pinned a note nearby!</p>
+                            {/if}
+                        </div>
+                    {/each}
+                {/if}
             {/key}
         </div>
     {/if}
