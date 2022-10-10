@@ -103,7 +103,7 @@
                     // console.log(listObj)
                 }
             localPosts.set(listObj);
-            console.log($localPosts)
+            // console.log($localPosts)
         })
     }
 

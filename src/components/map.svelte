@@ -90,7 +90,7 @@
                 // console.log(entry[1].lat)
                 // console.log(entry[1].lng)
                 new Marker()
-                    .setLngLat([entry[1].lng, entry[1].lat])
+                    .setLngLat([entry[1].lat, entry[1].lng])
                     .addTo(map);
                 currentPosts.push(entry[0])
             })
