@@ -76,18 +76,18 @@
 
 </script>
 
-<div class="relative bottom-0 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden">
+<div class="relative z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden">
     <div class="w-full flex items-center justify-between bg-slate-200">
        <div class="flex items-center gap-x-3 p-3">
-           <img src="../../static/logo.svg" alt="logo">
+           <img src="/logo.svg" alt="logo">
            <p class="text-lg leading-7 font-extrabold">:GeoNote</p>
        </div>
        <div class="h-full {feedExpandedState.width} items-center p-2.5 gap-x-2.5 flex bg-yellow-300 cursor-pointer transition-all duration-200" on:click={togglePostState}>
            {#if feedExpandedState.state === 'feed'}
-               <img class="h-2/3" src="../../static/add-line.svg" alt="add">
+               <img class="h-2/3" src="/add-line.svg" alt="add">
            {/if}
            {#if feedExpandedState.state === 'post'}
-               <img class="h-2/3" src="../../static/close-circle-fill.svg" alt="close">
+               <img class="h-2/3" src="/close-circle-fill.svg" alt="close">
            {/if}
            {#if feedExpandedState.state === 'feed'}
                 <p class="text-lg leading-7 font-extrabold min-w-max">Add a Note</p>
@@ -95,11 +95,11 @@
        </div>
     </div>
     {#if feedExpandedState.state === 'post'}
-        <div class="w-full h-full flex flex-col items-center p-8">
+        <div class="w-full h-full flex flex-col items-center p-8 pb-16">
             <textarea id="post" class="rounded-tl-lg rounded-tr-lg w-full h-full border-none" style="resize: none;"></textarea>
             <div class="w-full h-fit bg-white rounded-bl-lg rounded-br-lg flex justify-end">
                 <button class="w-fit p-2.5 bg-yellow-300 rounded-tl-lg rounded-br-lg flex gap-x-1 items-center" on:click={submitPost}>
-                    <img class="h-2/3" src="../../static/map-pin-fill.svg" alt="pin">
+                    <img class="h-2/3" src="/map-pin-fill.svg" alt="pin">
                     Pin
                 </button>
             </div>
