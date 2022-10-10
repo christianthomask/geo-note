@@ -32,7 +32,7 @@
     let feedExpandedState = {state: 'feed', class:"h-1/2", width:"w-40"};
     function togglePostState() {
         if (feedExpandedState.state === 'feed') {
-            feedExpandedState.class = "h-full";
+            feedExpandedState.class = "h-3/5";
             feedExpandedState.state = 'post';
             feedExpandedState.width = "w-10";
         } else if (feedExpandedState.state === 'post') {
@@ -76,7 +76,7 @@
 
 </script>
 
-<div class="relative z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden">
+<div class="fixed max-w-3xl m-auto z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden">
     <div class="w-full flex items-center justify-between bg-slate-200">
        <div class="flex items-center gap-x-3 p-3">
            <img src="/logo.svg" alt="logo">

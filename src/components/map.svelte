@@ -43,6 +43,7 @@
 
         setInterval(refreshMap, 500);
 
+
     });
 
     const firebaseConfig = {
@@ -91,7 +92,7 @@
 
 </script>
 
-<div class="w-full h-1/2">
+<div class="fixed w-full max-w-3xl h-1/2 m-auto transition-height duration-500 ease-in-out">
     <div class="map" id="map" bind:this={mapContainer}></div>
 </div>
 
