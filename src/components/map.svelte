@@ -2,8 +2,9 @@
     import { onMount } from 'svelte'
     import { Map, NavigationControl, GeolocateControl, Marker } from 'maplibre-gl';
     import 'maplibre-gl/dist/maplibre-gl.css';
-    import { getDatabase, ref as fireRef, onValue} from "firebase/database";
-    import {initializeApp} from "firebase/app";
+    import { getDatabase, ref as fireRef, onValue } from "firebase/database";
+    import { initializeApp } from "firebase/app";
+    import { userLoc } from "../stores.js"
 
     let map;
     let mapContainer;
@@ -42,6 +43,12 @@
         })
 
         setInterval(refreshMap, 500);
+        setInterval(() => {
+            geolocate.on('geolocate', (pos) => {
+                // console.log(pos);
+                userLoc.set(pos)
+            })
+        }, 500);
 
 
     });
@@ -70,7 +77,7 @@
                 for(let i=0;i<count;i++) {
                     // console.log(entry[1].lat)
                     // console.log(entry[1].lng)
-                    if (currentPosts[i] !== entry[0]) {
+                    if (currentPosts[i] !== entry[0] && entry[1].lat > -90 && entry[1].lat < 90) {
                         new Marker()
                             .setLngLat([entry[1].lat, entry[1].lng])
                             .addTo(map);

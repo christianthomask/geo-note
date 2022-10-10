@@ -3,7 +3,7 @@
     import { initializeApp } from "firebase/app";
     import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
     import { onMount } from 'svelte';
-    import { posts } from "../stores.js"
+    import { posts, localPosts, userLoc } from "../stores.js"
 
     let loc
     let lat = '0'
@@ -18,6 +18,8 @@
             posts.set(snapshot.val());
             // console.log(posts);
         })
+
+        setInterval(refreshFeed, 500);
     });
 
     let posting = false;
@@ -91,6 +93,47 @@
         currentPostId = id;
     }
 
+    function refreshFeed() {
+        let listObj = {};
+        Object.entries($posts).forEach((entry) => {
+            // console.log(userLoc);
+            const distance = findPinDistance($userLoc.coords.latitude, entry[1].lat, $userLoc.coords.longitude, entry[1].lng);
+            if (distance < 1 && !listObj[entry[0]]) {
+                    listObj[entry[0]] = entry[1]
+                    // console.log(listObj)
+                }
+            localPosts.set(listObj);
+            console.log($localPosts)
+        })
+    }
+
+    function findPinDistance(lat1, lat2, lon1, lon2) {
+
+        // The math module contains a function
+        // named toRadians which converts from
+        // degrees to radians.
+        lon1 =  lon1 * Math.PI / 180;
+        lon2 = lon2 * Math.PI / 180;
+        lat1 = lat1 * Math.PI / 180;
+        lat2 = lat2 * Math.PI / 180;
+
+        // Haversine formula
+        let dlon = lon2 - lon1;
+        let dlat = lat2 - lat1;
+        let a = Math.pow(Math.sin(dlat / 2), 2)
+            + Math.cos(lat1) * Math.cos(lat2)
+            * Math.pow(Math.sin(dlon / 2),2);
+
+        let c = 2 * Math.asin(Math.sqrt(a));
+
+        // Radius of earth in kilometers. Use 3956
+        // for miles
+        let r = 3956;
+
+        // calculate the result
+        return(c * r);
+    }
+
 </script>
 
 <div class="fixed max-w-3xl m-auto z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden overflow-y-scroll">
@@ -113,9 +156,9 @@
     </div>
     {#if feedExpandedState.state === 'feed'}
         <div class="w-full h-full flex flex-col gap-y-4 py-4">
-            {#key $posts}
-                {#if $posts}
-                    {#each Object.entries($posts) as [id, contents]}
+            {#key $localPosts}
+                {#if $localPosts}
+                    {#each Object.entries($localPosts) as [id, contents]}
                         <div class="w-full h-fit p-2.5 flex gap-y-2.5 items-center">
                             {#if contents.loading}
                                 <div class="absolute top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
@@ -135,10 +178,12 @@
     {/if}
     {#if feedExpandedState.state === 'post'}
         <div class="w-full h-full flex flex-col px-8 py-4  gap-y-2 pb-16">
-            <h3>{$posts[currentPostId].user} pinned:</h3>
+            <h3>{$localPosts[currentPostId].user}'s note:</h3>
             <div class="w-full h-full bg-white p-3 rounded-lg">
-                <p>{$posts[currentPostId].content}</p>
+                <p>{$localPosts[currentPostId].content}</p>
             </div>
+            <p>lat: {$localPosts[currentPostId].lat}</p>
+            <p>lng: {$localPosts[currentPostId].lng}</p>
         </div>
     {/if}
     {#if feedExpandedState.state === 'add'}
