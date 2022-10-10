@@ -79,7 +79,7 @@
                     // console.log(entry[1].lng)
                     if (currentPosts[i] !== entry[0] && entry[1].lat > -90 && entry[1].lat < 90) {
                         new Marker()
-                            .setLngLat([entry[1].lat, entry[1].lng])
+                            .setLngLat([entry[1].lng, entry[1].lat])
                             .addTo(map);
                         currentPosts.push(entry[0])
                     }
@@ -90,7 +90,7 @@
                 // console.log(entry[1].lat)
                 // console.log(entry[1].lng)
                 new Marker()
-                    .setLngLat([entry[1].lat, entry[1].lng])
+                    .setLngLat([entry[1].lng, entry[1].lat])
                     .addTo(map);
                 currentPosts.push(entry[0])
             })
