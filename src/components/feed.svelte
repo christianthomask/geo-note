@@ -8,6 +8,7 @@
     let loc
     let lat = '0'
     let lng = '0'
+    let currentPostId;
     posts.set({id: {loading: true}})
     onMount(() => {
         loc = window.navigator;
@@ -39,15 +40,19 @@
 
 
     let feedExpandedState = {state: 'feed', class:"h-1/2", width:"w-40"};
-    function togglePostState() {
-        if (feedExpandedState.state === 'feed') {
+    function togglePostState(state) {
+        if (feedExpandedState.state === 'feed' && state !== 'post') {
             feedExpandedState.class = "h-3/5";
-            feedExpandedState.state = 'post';
+            feedExpandedState.state = 'add';
             feedExpandedState.width = "w-10";
-        } else if (feedExpandedState.state === 'post') {
+        } else if (feedExpandedState.state === 'add' || feedExpandedState.state === 'post' && state !== 'post') {
             feedExpandedState.class = "h-1/2";
             feedExpandedState.state = 'feed';
             feedExpandedState.width = "w-40";
+        } else if (state === 'post') {
+            feedExpandedState.class = "h-3/5";
+            feedExpandedState.state = 'post';
+            feedExpandedState.width = "w-10";
         }
     }
 
@@ -81,6 +86,11 @@
             })
     }
 
+    function openPost(id) {
+        togglePostState('post')
+        currentPostId = id;
+    }
+
 </script>
 
 <div class="fixed max-w-3xl m-auto z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden overflow-y-scroll">
@@ -89,11 +99,11 @@
            <img src="/logo.svg" alt="logo">
            <p class="text-lg leading-7 font-extrabold">:GeoNote</p>
        </div>
-       <div class="h-full {feedExpandedState.width} items-center p-2.5 gap-x-2.5 flex bg-yellow-300 cursor-pointer transition-all duration-200" on:click={togglePostState}>
+       <div class="h-full {feedExpandedState.width} items-center p-2.5 gap-x-2.5 flex bg-yellow-300 cursor-pointer transition-all duration-200" on:click={() => togglePostState('nopost')}>
            {#if feedExpandedState.state === 'feed'}
                <img class="h-2/3" src="/add-line.svg" alt="add">
            {/if}
-           {#if feedExpandedState.state === 'post'}
+           {#if feedExpandedState.state === 'add' || feedExpandedState.state === 'post' }
                <img class="h-2/3" src="/close-circle-fill.svg" alt="close">
            {/if}
            {#if feedExpandedState.state === 'feed'}
@@ -113,7 +123,9 @@
                                 </div>
                             {/if}
                             {#if !contents.loading}
-                                <p>{contents.user} pinned a note nearby!</p>
+                                <div on:click={() => openPost(id)}>
+                                    <p>{contents.user} pinned a note nearby!</p>
+                                </div>
                             {/if}
                         </div>
                     {/each}
@@ -122,6 +134,14 @@
         </div>
     {/if}
     {#if feedExpandedState.state === 'post'}
+        <div class="w-full h-full flex flex-col px-8 py-4  gap-y-2 pb-16">
+            <h3>{$posts[currentPostId].user} pinned:</h3>
+            <div class="w-full h-full bg-white p-3 rounded-lg">
+                <p>{$posts[currentPostId].content}</p>
+            </div>
+        </div>
+    {/if}
+    {#if feedExpandedState.state === 'add'}
         <div class="w-full h-full flex flex-col items-center p-8 pb-16">
             <textarea id="post" class="rounded-tl-lg rounded-tr-lg w-full h-full border-none" style="resize: none;"></textarea>
             <div class="w-full h-fit bg-white rounded-bl-lg rounded-br-lg flex justify-end">
