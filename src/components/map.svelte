@@ -36,6 +36,11 @@
             geolocate.trigger();
         })
 
+        onValue(postRef, (snapshot) => {
+            postObj = snapshot.val();
+            refreshMap();
+        })
+
         setInterval(refreshMap, 500);
 
     });
@@ -56,10 +61,6 @@
     const db = getDatabase(app)
 
     const postRef = fireRef(db, '/posts');
-    onValue(postRef, (snapshot) => {
-        postObj = snapshot.val();
-        refreshMap();
-    })
 
     function refreshMap() {
         const count = currentPosts.length;
