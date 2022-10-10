@@ -1,14 +1,22 @@
 <script>
 
     import { initializeApp } from "firebase/app";
-    import { getDatabase, ref as fireRef, set, push } from "firebase/database";
+    import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
     import { onMount } from 'svelte';
+    import { posts } from "../stores.js"
 
     let loc
     let lat = '0'
     let lng = '0'
+    posts.set({id: {loading: true}})
     onMount(() => {
         loc = window.navigator;
+
+        onValue(postListRef, (snapshot) => {
+            console.log('post');
+            posts.set(snapshot.val());
+            console.log(posts);
+        })
     });
 
     let posting = false;
@@ -27,6 +35,7 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app)
+    const postListRef = fireRef(db, '/posts');
 
 
     let feedExpandedState = {state: 'feed', class:"h-1/2", width:"w-40"};
@@ -51,7 +60,6 @@
         });
     }
 
-
     function submitPost() {
         posting = true;
         getLocationPromise()
@@ -61,10 +69,9 @@
                 lat = coords.latitude
                 lng = coords.longitude
                 let post = document.getElementById('post').value
-                const postListRef = fireRef(db, '/posts');
                 const newPostRef = push(postListRef);
                 set(newPostRef, {
-                    user: 'Christian',
+                    user: 'TestUser',
                     lat: lat,
                     lng: lng,
                     content: post
@@ -76,7 +83,7 @@
 
 </script>
 
-<div class="fixed max-w-3xl m-auto z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden">
+<div class="fixed max-w-3xl m-auto z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden overflow-y-scroll">
     <div class="w-full flex items-center justify-between bg-slate-200">
        <div class="flex items-center gap-x-3 p-3">
            <img src="/logo.svg" alt="logo">
@@ -94,6 +101,24 @@
            {/if}
        </div>
     </div>
+    {#if feedExpandedState.state === 'feed'}
+        <div class="w-full h-full flex flex-col gap-y-4 py-4">
+            {#key $posts}
+                {#each Object.entries($posts) as [id, contents]}
+                    <div class="w-full h-fit p-2.5 flex gap-y-2.5 items-center">
+                        {#if contents.loading}
+                            <div class="absolute top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
+                                <p class="text-white">Loading...</p>
+                            </div>
+                        {/if}
+                        {#if !contents.loading}
+                            <p>{contents.user} pinned a note nearby!</p>
+                        {/if}
+                    </div>
+                {/each}
+            {/key}
+        </div>
+    {/if}
     {#if feedExpandedState.state === 'post'}
         <div class="w-full h-full flex flex-col items-center p-8 pb-16">
             <textarea id="post" class="rounded-tl-lg rounded-tr-lg w-full h-full border-none" style="resize: none;"></textarea>
