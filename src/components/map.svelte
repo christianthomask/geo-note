@@ -57,9 +57,8 @@
 
     const postRef = fireRef(db, '/posts');
     onValue(postRef, (snapshot) => {
-        const data = snapshot.val()
-        postObj = data;
-        // console.log(postObj)
+        postObj = snapshot.val();
+        refreshMap();
     })
 
     function refreshMap() {
