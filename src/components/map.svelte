@@ -42,13 +42,14 @@
             refreshMap();
         })
 
-        setInterval(refreshMap, 500);
-        setInterval(() => {
-            geolocate.on('geolocate', (pos) => {
-                // console.log(pos);
-                userLoc.set(pos)
-            })
-        }, 500);
+
+        setInterval(refreshMap, 5000);
+        geolocate.on('geolocate', (pos) => {
+            // console.log(pos);
+            userLoc.set(pos)
+        })
+
+
 
 
     });
@@ -74,18 +75,23 @@
         const count = currentPosts.length;
         if (count !== 0 && postObj !== null) {
             Object.entries(postObj).forEach((entry) => {
-                for(let i=0;i<count;i++) {
+                let posted = false;
+                currentPosts.forEach((post) => {
                     // console.log(entry[1].lat)
                     // console.log(entry[1].lng)
-                    if (currentPosts[i] !== entry[0] && entry[1].lat > -90 && entry[1].lat < 90) {
-                        new Marker()
-                            .setLngLat([entry[1].lng, entry[1].lat])
-                            .addTo(map);
-                        currentPosts.push(entry[0])
+                    if (post === entry[0]) {
+                        posted = true;
                     }
+                })
+                // console.log(posted);
+                if (!posted) {
+                    new Marker()
+                        .setLngLat([entry[1].lng, entry[1].lat])
+                        .addTo(map);
+                    currentPosts.push(entry[0])
                 }
             })
-        } else if (postObj !== null) {
+        } else if (count === 0 && postObj !== null) {
             Object.entries(postObj).forEach((entry) => {
                 // console.log(entry[1].lat)
                 // console.log(entry[1].lng)

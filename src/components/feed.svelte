@@ -19,7 +19,7 @@
             // console.log(posts);
         })
 
-        setInterval(refreshFeed, 500);
+        setInterval(refreshFeed, 5000);
     });
 
     let posting = false;
