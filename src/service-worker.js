@@ -34,9 +34,12 @@ onValue(postListRef, (snapshot) => {
 
     Object.entries(posts).forEach((entry) => {
         if(nPerm === 'granted' && localStorage.getItem(entry[0]) !== 'true') {
-            new Notification(entry[1].user + " pinned a note nearby!", {
-                body: "Tap to see more...",
-                data: {post: entry[0]},
+            navigator.serviceWorker.ready.then((registration) => {
+                registration.showNotification(entry[1].user + " pinned a note nearby!", {
+                    body: "Tap to see more...",
+                    vibrate: [200, 100, 200, 100, 200, 100, 200],
+                    data: {post: entry[0]},
+                })
             })
         }
     })
