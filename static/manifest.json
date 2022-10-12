@@ -3,7 +3,7 @@
     "description": "Pin notes at your favorite places for friends to discover!",
     "display": "fullscreen",
     "icons": [{
-        "src": "pwa_logo.svg",
+        "src": "./pwa_logo.svg",
         "sizes": "144x144",
         "type": "image/svg",
         "purpose": "any"
