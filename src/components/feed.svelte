@@ -3,15 +3,25 @@
     import { initializeApp } from "firebase/app";
     import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
     import { onMount } from 'svelte';
-    import { posts, localPosts, userLoc } from "../stores.js"
+    import { posts, userLoc, notifPerm } from "../stores.js"
 
     let loc
     let lat = '0'
     let lng = '0'
     let currentPostId;
+    let localPosts = {};
+    let currentPosts = {};
     posts.set({id: {loading: true}})
     onMount(() => {
         loc = window.navigator;
+
+
+
+        if ($notifPerm === 'unset') {
+            Notification.requestPermission().then(perm => {
+                notifPerm.set(perm);
+            })
+        }
 
         onValue(postListRef, (snapshot) => {
             // console.log('post');
@@ -94,17 +104,30 @@
     }
 
     function refreshFeed() {
-        let listObj = {};
+        // console.log(localPosts);
+        // let listObj = {};
+        // console.log(Object.entries($posts))
         Object.entries($posts).forEach((entry) => {
+            // console.log(entry);
             // console.log(userLoc);
             const distance = findPinDistance($userLoc.coords.latitude, entry[1].lat, $userLoc.coords.longitude, entry[1].lng);
-            if (distance < 1 && !listObj[entry[0]]) {
-                    listObj[entry[0]] = entry[1]
-                    // console.log(listObj)
+            if (distance < 1 && localPosts[entry[0]] === undefined) {
+                localPosts[entry[0]] = entry[1]
+                if($notifPerm === 'granted' && localStorage.getItem(entry[0]) !== 'true') {
+                    const notif = new Notification(entry[1].user + " pinned a note nearby!", {
+                        body: "Tap to see more...",
+                        data: {post: entry[0]},
+                    })
+                    notif.addEventListener('click')
                 }
-            localPosts.set(listObj);
+                // console.log(listObj)
+                // console.log(Object.entries($localPosts)[entry[0]])
+            }
+            // localPosts.set(listObj);
             // console.log($localPosts)
-        })
+            // console.log(Object.entries($localPosts)[entry[0]])
+            cachePostIds(localPosts)
+        });
     }
 
     function findPinDistance(lat1, lat2, lon1, lon2) {
@@ -134,6 +157,14 @@
         return(c * r);
     }
 
+    function cachePostIds(postsObj) {
+        Object.entries(postsObj).forEach((entry) => {
+            if (!localStorage.getItem(entry[0])) {
+                localStorage.setItem(entry[0], 'true')
+                }
+        });
+    }
+
 </script>
 
 <div class="fixed max-w-3xl m-auto z-20 bottom-3 w-full max-w-3xl {feedExpandedState.class} flex flex-col bg-slate-100 transition-height duration-500 ease-in-out overflow-x-hidden overflow-y-scroll">
@@ -156,9 +187,9 @@
     </div>
     {#if feedExpandedState.state === 'feed'}
         <div class="w-full h-full flex flex-col gap-y-4 py-4">
-            {#key $localPosts}
-                {#if $localPosts}
-                    {#each Object.entries($localPosts) as [id, contents]}
+            {#key localPosts}
+                {#if localPosts}
+                    {#each Object.entries(localPosts) as [id, contents]}
                         <div class="w-full h-fit p-2.5 flex gap-y-2.5 items-center">
                             {#if contents.loading}
                                 <div class="absolute top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
@@ -178,12 +209,12 @@
     {/if}
     {#if feedExpandedState.state === 'post'}
         <div class="w-full h-full flex flex-col px-8 py-4  gap-y-2 pb-16">
-            <h3>{$localPosts[currentPostId].user}'s note:</h3>
+            <h3>{localPosts[currentPostId].user}'s note:</h3>
             <div class="w-full h-full bg-white p-3 rounded-lg">
-                <p>{$localPosts[currentPostId].content}</p>
+                <p>{localPosts[currentPostId].content}</p>
             </div>
-            <p>lat: {$localPosts[currentPostId].lat}</p>
-            <p>lng: {$localPosts[currentPostId].lng}</p>
+            <p>lat: {localPosts[currentPostId].lat}</p>
+            <p>lng: {localPosts[currentPostId].lng}</p>
         </div>
     {/if}
     {#if feedExpandedState.state === 'add'}
