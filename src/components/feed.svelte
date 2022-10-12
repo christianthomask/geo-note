@@ -20,6 +20,7 @@
         if ($notifPerm === 'unset') {
             Notification.requestPermission().then(perm => {
                 notifPerm.set(perm);
+                localStorage.setItem('nPerm', perm);
             })
         }
 
@@ -113,13 +114,6 @@
             const distance = findPinDistance($userLoc.coords.latitude, entry[1].lat, $userLoc.coords.longitude, entry[1].lng);
             if (distance < 1 && localPosts[entry[0]] === undefined) {
                 localPosts[entry[0]] = entry[1]
-                if($notifPerm === 'granted' && localStorage.getItem(entry[0]) !== 'true') {
-                    const notif = new Notification(entry[1].user + " pinned a note nearby!", {
-                        body: "Tap to see more...",
-                        data: {post: entry[0]},
-                    })
-                    notif.addEventListener('click')
-                }
                 // console.log(listObj)
                 // console.log(Object.entries($localPosts)[entry[0]])
             }

@@ -26,6 +26,18 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app)
 const postListRef = fireRef(db, '/posts');
 
+let nPerm = localStorage.getItem('nPerm');
+
 onValue(postListRef, (snapshot) => {
     console.log('post')
+    let posts = snapshot.val();
+
+    Object.entries(posts).forEach((entry) => {
+        if(nPerm === 'granted' && localStorage.getItem(entry[0]) !== 'true') {
+            new Notification(entry[1].user + " pinned a note nearby!", {
+                body: "Tap to see more...",
+                data: {post: entry[0]},
+            })
+        }
+    })
 })
