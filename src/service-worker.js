@@ -39,10 +39,12 @@ onmessage = (event) => {
 
 onValue(postListRef, (snapshot) => {
     console.log('post')
+    console.log(nPerm)
     let posts = snapshot.val();
 
     Object.entries(posts).forEach((entry) => {
         console.log("foreach")
+        console.log(localPosts[entry[0]])
         if(nPerm === 'granted' && localPosts[entry[0]] !== 'true') {
             console.log("filtered")
             navigator.serviceWorker.ready.then((registration) => {
