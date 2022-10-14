@@ -42,7 +42,9 @@ onValue(postListRef, (snapshot) => {
     let posts = snapshot.val();
 
     Object.entries(posts).forEach((entry) => {
+        console.log("foreach")
         if(nPerm === 'granted' && localPosts[entry[0]] !== 'true') {
+            console.log("filtered")
             navigator.serviceWorker.ready.then((registration) => {
                 registration.showNotification(entry[1].user + " pinned a note nearby!", {
                     body: "Tap to see more...",
