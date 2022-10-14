@@ -22,7 +22,6 @@
             style: `https://api.maptiler.com/maps/streets/style.json?key=${apiKey}`,
             center: [initialState.lng, initialState.lat],
             zoom: initialState.zoom,
-            interactive: false
         });
 
         let geolocate = new GeolocateControl({

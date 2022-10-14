@@ -10,7 +10,6 @@
     let lng = '0'
     let currentPostId;
     let localPosts = {};
-    let currentPosts = {};
     posts.set({id: {loading: true}})
     onMount(() => {
         loc = window.navigator;
@@ -20,7 +19,8 @@
         if ($notifPerm === 'unset') {
             Notification.requestPermission().then(perm => {
                 notifPerm.set(perm);
-                localStorage.setItem('nPerm', perm);
+                const pkg = {"tag": "perm", "package": perm}
+                window.postMessage(pkg);
             })
         }
 
@@ -120,7 +120,8 @@
             // localPosts.set(listObj);
             // console.log($localPosts)
             // console.log(Object.entries($localPosts)[entry[0]])
-            cachePostIds(localPosts)
+            postPostIds(localPosts);
+            cachePostIds(localPosts);
         });
     }
 
@@ -157,6 +158,13 @@
                 localStorage.setItem(entry[0], 'true')
                 }
         });
+    }
+    function postPostIds(postsObj) {
+        let pkg = {"tag": "posts", "package": {}};
+        Object.entries(postsObj).forEach((entry) => {
+            pkg.package[entry[0]] = 'true';
+        });
+        window.postMessage(pkg);
     }
 
 </script>
