@@ -20,7 +20,7 @@
             Notification.requestPermission().then(perm => {
                 notifPerm.set(perm);
                 const pkg = {"tag": "perm", "package": perm}
-                window.postMessage(pkg);
+                navigator.serviceWorker.controller.postMessage(pkg);
             })
         }
 
@@ -164,7 +164,7 @@
         Object.entries(postsObj).forEach((entry) => {
             pkg.package[entry[0]] = 'true';
         });
-        window.postMessage(pkg);
+        navigator.serviceWorker.controller.postMessage(pkg);
     }
 
 </script>
