@@ -28,8 +28,9 @@ const postListRef = fireRef(db, '/posts');
 
 let nPerm;
 let localPosts;
+const source = new EventSource("https://www.gnote.app/home")
 
-onmessage = (event) => {
+source.onmessage = (event) => {
     if (event.data.tag === "perm") {
         nPerm = event.data.package;
     } else if (event.data.tag === "posts") {
