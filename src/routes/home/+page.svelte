@@ -2,12 +2,15 @@
     import Feed from "../../components/feed.svelte"
     import Map from "../../components/map.svelte"
     import Navbar from '../../components/navbar.svelte'
+    import {onMount} from "svelte"
 
-    Notification.requestPermission((result) => {
-        if (result === 'granted') {
-            console.log(result)
-        }
-    });
+    onMount(() => {
+        Notification.requestPermission((result) => {
+            if (result === 'granted') {
+                console.log(result)
+            }
+        });
+    })
 
 </script>
 
