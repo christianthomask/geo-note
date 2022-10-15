@@ -1,4 +1,4 @@
-import {getDatabase, ref as fireRef, onValue, set} from "firebase/database";
+import {getDatabase, ref as fireRef, onValue, set, update as fireUpdate} from "firebase/database";
 import {initializeApp} from "firebase/app";
 
 
@@ -61,7 +61,9 @@ onValue(postListRef, (snapshot) => {
                     vibrate: [200, 100, 200, 100, 200, 100, 200],
                     data: {post: entry[0]},
                 });
-            set(fireRef(db, '/posts/' + entry[0] + '/notified'),  'true');
+            let update = {};
+            update['/posts/' + entry[0]] = 'true;'
+            fireUpdate(fireRef(db), update);
         }
     })
 })
