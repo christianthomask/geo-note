@@ -3,6 +3,11 @@
     import Map from "../../components/map.svelte"
     import Navbar from '../../components/navbar.svelte'
 
+    Notification.requestPermission((result) => {
+        if (result === 'granted') {
+            console.log(result)
+        }
+    });
 
 </script>
 

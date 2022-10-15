@@ -56,17 +56,13 @@ onValue(postListRef, (snapshot) => {
         // console.log(localPosts[entry[0]])
         if(entry[1]['notified'] !== 'true') {
             console.log("filtered")
-            Notification.requestPermission((result) => {
-                if (result === 'granted') {
-                    navigator.serviceWorker.ready.then((registration) => {
-                        registration.showNotification(entry[1].user + " pinned a note!", {
-                            body: "Tap to see more...",
-                            vibrate: [200, 100, 200, 100, 200, 100, 200],
-                            data: {post: entry[0]},
-                        });
+                navigator.serviceWorker.ready.then((registration) => {
+                    registration.showNotification(entry[1].user + " pinned a note!", {
+                        body: "Tap to see more...",
+                        vibrate: [200, 100, 200, 100, 200, 100, 200],
+                        data: {post: entry[0]},
                     });
-                }
-            });
+                });
             set(fireRef(db, '/posts/' + entry[0]), {'notified': 'true'});
         }
     })
