@@ -107,6 +107,9 @@
     function openPost(id) {
         togglePostState('post')
         currentPostId = id;
+        if ($feedState !== 'unset') {
+            feedState.set('unset')
+        }
     }
 
     function refreshFeed() {
