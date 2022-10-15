@@ -61,8 +61,10 @@ onValue(postListRef, (snapshot) => {
                     vibrate: [200, 100, 200, 100, 200, 100, 200],
                     data: {post: entry[0]},
                 });
-            entry[1]['notified'] = 'true'
-            set(fireRef(db, '/posts/' + entry[0]), entry[1]);
+            entry[1]['notified'] = 'true';
+            let update = {};
+            update['/posts/' + entry[0]] = entry[1]
+            fireUpdate(fireRef(db), update);
         }
     })
 })
