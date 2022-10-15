@@ -10,6 +10,10 @@ self.addEventListener('activate', (event) => {
     console.log('sw activated')
 })
 
+self.addEventListener("fetch", event => {
+    console.log(`URL requested: ${event.request.url}`);
+});
+
 const firebaseConfig = {
     apiKey: "AIzaSyBbaLefwpOcEG1dewjTeXJroUDr7TCuNLU",
     authDomain: "geo-note-1c91e.firebaseapp.com",
