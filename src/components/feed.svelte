@@ -3,7 +3,7 @@
     import { initializeApp } from "firebase/app";
     import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
     import { onMount } from 'svelte';
-    import { posts, userLoc, notifPerm } from "../stores.js"
+    import { posts, userLoc, notifPerm, feedState } from "../stores.js"
 
     let loc
     let lat = '0'
@@ -14,15 +14,20 @@
     onMount(() => {
         loc = window.navigator;
 
+        let mapTap =  feedState.subscribe((val) => {
+            if(val !== 'unset') {
+                console.log(val)
+                openPost(val);
+            }
+        });
 
-
-        if ($notifPerm === 'unset') {
-            Notification.requestPermission().then(perm => {
-                notifPerm.set(perm);
-                const pkg = {"tag": "perm", "package": perm}
-                navigator.serviceWorker.controller.postMessage(pkg);
-            })
-        }
+        // if ($notifPerm === 'unset') {
+        //     Notification.requestPermission().then(perm => {
+        //         notifPerm.set(perm);
+        //         const pkg = {"tag": "perm", "package": perm}
+        //         navigator.serviceWorker.controller.postMessage(pkg);
+        //     })
+        // }
 
         onValue(postListRef, (snapshot) => {
             // console.log('post');
@@ -120,7 +125,7 @@
             // localPosts.set(listObj);
             // console.log($localPosts)
             // console.log(Object.entries($localPosts)[entry[0]])
-            postPostIds(localPosts);
+            // postPostIds(localPosts);
             cachePostIds(localPosts);
         });
     }
@@ -159,13 +164,13 @@
                 }
         });
     }
-    function postPostIds(postsObj) {
-        let pkg = {"tag": "posts", "package": {}};
-        Object.entries(postsObj).forEach((entry) => {
-            pkg.package[entry[0]] = 'true';
-        });
-        navigator.serviceWorker.controller.postMessage(pkg);
-    }
+    // function postPostIds(postsObj) {
+    //     let pkg = {"tag": "posts", "package": {}};
+    //     Object.entries(postsObj).forEach((entry) => {
+    //         pkg.package[entry[0]] = 'true';
+    //     });
+    //     navigator.serviceWorker.controller.postMessage(pkg);
+    // }
 
 </script>
 
@@ -211,12 +216,12 @@
     {/if}
     {#if feedExpandedState.state === 'post'}
         <div class="w-full h-full flex flex-col px-8 py-4  gap-y-2 pb-16">
-            <h3>{localPosts[currentPostId].user}'s note:</h3>
+            <h3>{$posts[currentPostId].user}'s note:</h3>
             <div class="w-full h-full bg-white p-3 rounded-lg">
-                <p>{localPosts[currentPostId].content}</p>
+                <p>{$posts[currentPostId].content}</p>
             </div>
-            <p>lat: {localPosts[currentPostId].lat}</p>
-            <p>lng: {localPosts[currentPostId].lng}</p>
+            <p>lat: {$posts[currentPostId].lat}</p>
+            <p>lng: {$posts[currentPostId].lng}</p>
         </div>
     {/if}
     {#if feedExpandedState.state === 'add'}

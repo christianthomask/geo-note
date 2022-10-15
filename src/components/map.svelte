@@ -4,7 +4,7 @@
     import 'maplibre-gl/dist/maplibre-gl.css';
     import { getDatabase, ref as fireRef, onValue } from "firebase/database";
     import { initializeApp } from "firebase/app";
-    import { userLoc } from "../stores.js"
+    import { userLoc, feedState } from "../stores.js"
 
     let map;
     let mapContainer;
@@ -94,9 +94,12 @@
             Object.entries(postObj).forEach((entry) => {
                 // console.log(entry[1].lat)
                 // console.log(entry[1].lng)
-                new Marker()
+                const marker = new Marker()
                     .setLngLat([entry[1].lng, entry[1].lat])
                     .addTo(map);
+                marker.getElement().addEventListener('click', () =>{
+                    feedState.set(entry[0]);
+                })
                 currentPosts.push(entry[0])
             })
         }

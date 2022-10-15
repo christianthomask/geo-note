@@ -1,4 +1,4 @@
-import {getDatabase, ref as fireRef, onValue} from "firebase/database";
+import {getDatabase, ref as fireRef, onValue, set} from "firebase/database";
 import {initializeApp} from "firebase/app";
 
 
@@ -30,35 +30,40 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app)
 const postListRef = fireRef(db, '/posts');
 
-let nPerm;
-let localPosts;
+// let nPerm;
+// let localPosts;
 
 
-self.addEventListener('message', (event) => {
-    if (event.data.tag === "perm") {
-        nPerm = event.data.package;
-    } else if (event.data.tag === "posts") {
-        localPosts = event.data.package;
-    }
-})
+// self.addEventListener('message', (event) => {
+//     if (event.data.tag === "perm") {
+//         nPerm = event.data.package;
+//     } else if (event.data.tag === "posts") {
+//         localPosts = event.data.package;
+//     }
+// })
 
 onValue(postListRef, (snapshot) => {
-    console.log('post')
-    console.log(nPerm)
+    // console.log('post')
+    // console.log(nPerm)
     let posts = snapshot.val();
 
     Object.entries(posts).forEach((entry) => {
+        // const postPath = fireRef(db, '/posts' + entry[0]);
+        // fireGet(postPath).then((snapshot) => {
+        //     let postData = snapshot.val()
+        // })
         console.log("foreach")
-        console.log(localPosts[entry[0]])
-        if(nPerm === 'granted' && localPosts[entry[0]] !== 'true') {
+        // console.log(localPosts[entry[0]])
+        if(entry[1]['notified'] !== 'true') {
             console.log("filtered")
             navigator.serviceWorker.ready.then((registration) => {
-                registration.showNotification(entry[1].user + " pinned a note nearby!", {
+                registration.showNotification(entry[1].user + " pinned a note!", {
                     body: "Tap to see more...",
                     vibrate: [200, 100, 200, 100, 200, 100, 200],
                     data: {post: entry[0]},
                 })
             })
+            set(fireRef(db, '/posts/' + entry[0]), {'notified': 'true'});
         }
     })
 })
