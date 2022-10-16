@@ -327,7 +327,7 @@
 
         <!--addPin-->
         <div id="addPin" class="w-full max-w-3xl h-screen fixed flex flex-col items-center z-20 bg-gray-50 hidden">
-            <div class="w-full h-4/6 pt-7 px-3 gap-6 flex flex-col items-center">
+            <div class="w-full h-2/4 pt-7 px-3 gap-6 flex flex-col items-center">
 
                 <!--addMedia-->
                 <div class="flex flex-col items-center gap-2">
@@ -339,7 +339,7 @@
                 </div>
 
                 <!--Contents-->
-                <div class="w-full h-4/6 flex flex-col items-center px-3 gap-6">
+                <div class="w-full h-fit flex flex-col items-center px-3 gap-6">
                     <textarea id="contents" placeholder="Add Note" class="rounded-lg w-full h-full border-gray-300" style="resize: none;"></textarea>
                 </div>
 
@@ -348,7 +348,12 @@
                     <img src="pin.svg" alt="Pin">
                 </div>
 
+
+
             </div>
+
+            <!--Blank-->
+            <div class="w-full h-2/4 bg-gray-300"></div>
         </div>
 
         <!--addPinClose-->
