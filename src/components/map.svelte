@@ -4,7 +4,7 @@
     import 'maplibre-gl/dist/maplibre-gl.css';
     import { getDatabase, ref as fireRef, onValue } from "firebase/database";
     import { initializeApp } from "firebase/app";
-    import { userLoc, feedState } from "../stores.js"
+    import { userLoc, feedState, cos } from "../stores.js"
 
     let map;
     let mapContainer;
@@ -48,7 +48,13 @@
             userLoc.set(pos)
         })
 
-
+        let CoS =  cos.subscribe((val) => {
+            if(val !== 'unset') {
+                // console.log('center')
+                geolocate.trigger();
+                cos.set('unset')
+            }
+        });
 
 
     });
@@ -107,7 +113,7 @@
 
 </script>
 
-<div class="fixed w-full max-w-3xl h-1/2 m-auto transition-height duration-500 ease-in-out">
+<div class="fixed z-0 top-0 w-full max-w-3xl h-full m-auto">
     <div class="map" id="map" bind:this={mapContainer}></div>
 </div>
 
