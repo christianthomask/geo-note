@@ -90,9 +90,12 @@
                 })
                 // console.log(posted);
                 if (!posted) {
-                    new Marker()
+                    const marker = new Marker()
                         .setLngLat([entry[1].lng, entry[1].lat])
                         .addTo(map);
+                    marker.getElement().addEventListener('click', () =>{
+                        feedState.set(entry[0]);
+                    })
                     currentPosts.push(entry[0])
                 }
             })
