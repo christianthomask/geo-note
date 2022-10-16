@@ -2,6 +2,7 @@
     import Map from "../../components/map.svelte"
     import { initializeApp } from "firebase/app";
     import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
+    import { getStorage, ref as storeRef, uploadBytes } from "firebase/storage";
     import { onMount } from 'svelte';
     import { posts, userLoc, notifPerm, feedState, cos } from "../../stores.js"
 
@@ -11,6 +12,8 @@
     let currentPostId;
     let localPosts = {};
     posts.set({id: {loading: true}})
+
+    let currentRecording;
 
     let uiLogo;
     let uiCoS;
@@ -22,6 +25,16 @@
     let uiAddPin;
     let uiSubmitPin;
     let uiAddPinClose;
+    let uiAddMedia;
+    let uiRecordMedia;
+    let uiPreview;
+    let uiRecording;
+    let uiFinalPreview;
+    let uiVideo;
+    let uiPicture;
+    let uiApproveMedia;
+    let uiAcceptMedia;
+    let uiRejectMedia;
 
     onMount(() => {
         loc = window.navigator;
@@ -35,9 +48,60 @@
         uiAddPin = document.getElementById('addPin');
         uiSubmitPin = document.getElementById('submitPin');
         uiAddPinClose = document.getElementById('addPinClose');
+        uiAddMedia = document.getElementById('addMedia');
+        uiRecordMedia = document.getElementById('recordMedia');
+        uiPreview = document.getElementById('preview');
+        uiRecording = document.getElementById('recording');
+        uiFinalPreview = document.getElementById('finalPreview');
+        uiVideo = document.getElementById('takeVideo');
+        uiPicture = document.getElementById('takePicture');
+        uiApproveMedia = document.getElementById('approveMedia');
+        uiAcceptMedia = document.getElementById('acceptMedia');
+        uiRejectMedia = document.getElementById('rejectMedia');
+        let recordingTimeMS = 5000;
+        let mediaStream;
         uiInitAnim(uiMenu);
         uiInitAnim(uiPin);
 
+        uiAddMedia.addEventListener("click", () => {
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+        }).then((stream) => {
+            uiPreview.srcObject = stream;
+                mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+                uiShow(uiRecordMedia);
+            })
+        }, false)
+
+        uiVideo.addEventListener("click", () => {
+            mediaStream.then(() => {
+                uiVideo.classList.remove('bg-gray-700')
+                uiVideo.classList.add('bg-red-500')
+                startRecording(uiPreview.captureStream(), recordingTimeMS)
+                    .then((recordedChunks) => {
+                        let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+                        currentRecording = recordedBlob;
+                        uiRecording.src = URL.createObjectURL(recordedBlob);
+                        uiShow(uiApproveMedia);
+                        console.log(recordedBlob.size);
+                        uiVideo.classList.remove('bg-red-500')
+                        uiVideo.classList.add('bg-gray-700')
+                    }).catch((error) => {
+                    if (error.name === "NotFoundError") {
+                        console.log("Camera or microphone not found. Can't record.");
+                    } else {
+                        console.log(error);
+                    }
+                });
+            })
+        });
+
+        uiAcceptMedia.addEventListener("click", () => {
+            uiRecording.src = "";
+            uiHide(uiApproveMedia);
+            uiHide(uiRecordMedia);
+        })
 
 
         let mapTap =  feedState.subscribe((val) => {
@@ -80,6 +144,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app)
     const postListRef = fireRef(db, '/posts');
+    // Get a reference to the storage service, which is used to create references in your storage bucket
+    const storage = getStorage();
+
+    // Create a storage reference from our storage service
 
 
     let feedExpandedState = {state: 'feed', class:"h-1/2", width:"w-40"};
@@ -113,19 +181,35 @@
         getLocationPromise()
             .then((res) => {
                 // console.log('run')
-                const { coords } = res;
+                const {coords} = res;
                 lat = coords.latitude;
                 lng = coords.longitude;
                 let post = document.getElementById('contents');
                 const postContents = post.value;
                 post.value = "";
                 const newPostRef = push(postListRef);
-                set(newPostRef, {
-                    user: 'TestUser',
-                    lat: lat,
-                    lng: lng,
-                    content: postContents
-                });
+                console.log(newPostRef);
+                if (!currentRecording) {
+                    set(newPostRef, {
+                        user: 'TestUser',
+                        lat: lat,
+                        lng: lng,
+                        content: postContents
+                    });
+                } else if (currentRecording) {
+                    console.log(newPostRef._path.pieces_[1]);
+                    let storageId = storeRef(storage, "/videos/" + newPostRef._path.pieces_[1])
+                    uploadBytes(storageId, currentRecording).then((snapshot) => {
+                        console.log('Uploaded a blob or file!');
+                    });
+                    set(newPostRef, {
+                        user: 'TestUser',
+                        lat: lat,
+                        lng: lng,
+                        content: postContents,
+                        videoPath: storageId.fullPath
+                    });
+                }
                 uiHide(uiAddPin)
                 uiHide(uiPost)
                 uiShrink(uiAddPinClose);
@@ -235,6 +319,34 @@
     //     navigator.serviceWorker.controller.postMessage(pkg);
     // }
 
+    function wait(delay) {
+        return new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    function startRecording(stream, length) {
+        let recorder = new MediaRecorder(stream);
+        let data = [];
+        recorder.ondataavailable = (event) => data.push(event.data);
+        recorder.start();
+
+        let stopped = new Promise((resolve, reject) => {
+            recorder.onstop = resolve;
+            recorder.onerror = (event) => reject(event.name);
+        });
+
+        let recorded = wait(length).then(() => {
+                if (recorder.state === "recording") {
+                    recorder.stop();
+                }
+            },
+        );
+
+        return Promise.all([recorded, stopped]).then(() => data);
+    }
+
+    function stopRecording(stream) {
+        stream.getTracks().forEach((track) => track.stop());
+    }
 
     onMount(() => {
         Notification.requestPermission((result) => {
@@ -295,6 +407,15 @@
         <!--Post-->
         <div id="post" class="w-full max-w-3xl h-screen pt-7 px-3 fixed flex flex-col z-20 bg-gray-50 hidden">
 
+            <!--Media-->
+            {#if $posts[currentPostId]}
+                {#if $posts[currentPostId].videoPath}
+                    <div class="w-fit h-fit rounded-lg overflow-hidden relative">
+                        <video id="pinVideo" class="w-full h-full max-w-xs max-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop></video>
+                    </div>
+                {/if}
+            {/if}
+
             <!--Poster-->
             <div class="w-fit h-fit flex flex-col px-6 gap-2">
                 <img src="yo.png" alt="Yo" class="w-16 h-16 rounded-full">
@@ -306,7 +427,7 @@
             <!--postContent-->
             <div class="w-full h-4/6 py-3 px-6">
                 {#if $posts[currentPostId]}
-                    <p class="text-lg-leading-7 font-medium text-gray-700">{$posts[currentPostId].content}</p>
+                    <p class="text-lg-leading-7 font-medium text-gray-700 mb-2">{$posts[currentPostId].content}</p>
                     <p class="text-lg-leading-7 font-medium text-gray-700">lat: {$posts[currentPostId].lat}</p>
                     <p class="text-lg-leading-7 font-medium text-gray-700">lng: {$posts[currentPostId].lng}</p>
                 {/if}
@@ -329,14 +450,27 @@
         <div id="addPin" class="w-full max-w-3xl h-screen fixed flex flex-col items-center z-20 bg-gray-50 hidden">
             <div class="w-full h-2/4 pt-7 px-3 gap-6 flex flex-col items-center">
 
-                <!--addMedia-->
-                <div class="flex flex-col items-center gap-2">
-                    <div class="cursor-not-allowed w-16 h-16 rounded-full bg-gray-700 flex justify-center items-center">
-                        <img src="addMedia.svg" alt="Add Media">
-                        <img src="disabled.svg" alt="Disabled" class="absolute">
+                <!--Media-->
+                {#if !currentRecording}
+
+                    <!--addMedia-->
+                    <div class="flex flex-col items-center gap-2">
+                        <div id="addMedia" class="cursor-pointer w-16 h-16 rounded-full bg-gray-700 flex justify-center items-center">
+                            <img src="addMedia.svg" alt="Add Media">
+                        </div>
+                        <p class="text-lg leading-7 font-medium test-gray-700">Add a Photo or Video</p>
                     </div>
-                    <p class="text-lg leading-7 font-medium test-gray-700">Add a Photo or Video</p>
-                </div>
+
+                {/if}
+
+                {#if currentRecording}
+
+                    <!--finalPreview-->
+                    <div class="w-fit h-fit rounded-lg overflow-hidden relative">
+                        <video id="finalPreview" class="w-full h-full max-w-xs max-h-xs" src="{URL.createObjectURL(currentRecording)}" autoplay loop muted></video>
+                    </div>
+
+                {/if}
 
                 <!--Contents-->
                 <div class="w-full h-fit flex flex-col items-center px-3 gap-6">
@@ -351,14 +485,42 @@
 
 
             </div>
-
-            <!--Blank-->
-            <div class="w-full h-2/4 bg-gray-300"></div>
         </div>
 
         <!--addPinClose-->
         <div id="addPinClose" class="cursor-pointer z-20 w-28 h-28 flex justify-center items-center bg-gray-300 absolute top-0 right-0 z-20 rounded-tl-full rounded-bl-full rounded-br-full scale-0 origin-top-right ease-springy" on:click={exitPin}>
             <img src="close.svg" alt="Close">
+        </div>
+
+        <!--recordMedia-->
+        <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
+            <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
+                <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted></video>
+            </div>
+            <div class="w-fit h-fit flex gap-x-6">
+                <div id="takePicture" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
+                    <img src="camera.svg" alt="Take Picture">
+                    <img src="disabled.svg" alt="Disabled" class="absolute">
+                </div>
+                <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full">
+                    <img src="video.svg" alt="Take Video">
+                </div>
+            </div>
+        </div>
+
+        <!--approveMedia-->
+        <div id="approveMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-40 bg-gray-50 hidden">
+            <div class="w-fit h-fit rounded-lg overflow-hidden relative">
+                <video id="recording" class="w-full h-full max-w-xs max-h-xs" autoplay loop></video>
+            </div>
+            <div class="w-fit h-fit flex gap-x-6">
+                <div id="rejectMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full" on:click={submitPost}>
+                    <img src="back.svg" alt="Back">
+                </div>
+                <div id="acceptMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-blue-500 rounded-full" on:click={submitPost}>
+                    <img src="checkbox-fill.svg" alt="Accept">
+                </div>
+            </div>
         </div>
 
         <!--Map-->
