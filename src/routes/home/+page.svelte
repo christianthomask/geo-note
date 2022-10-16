@@ -201,17 +201,18 @@
                     let storageId = storeRef(storage, "/videos/" + newPostRef._path.pieces_[1])
                     uploadBytes(storageId, currentRecording).then((snapshot) => {
                         console.log('Uploaded a blob or file!');
-                    });
-                    getDownloadURL(storageId)
-                        .then((url => {
-                            set(newPostRef, {
-                                user: 'TestUser',
-                                lat: lat,
-                                lng: lng,
-                                content: postContents,
-                                videoPath: url
-                            });
-                        }))
+                    }).then(() => {
+                        getDownloadURL(storageId)
+                            .then((url => {
+                                set(newPostRef, {
+                                    user: 'TestUser',
+                                    lat: lat,
+                                    lng: lng,
+                                    content: postContents,
+                                    videoPath: url
+                                });
+                            }))
+                    })
                 }
                 uiHide(uiAddPin)
                 uiHide(uiPost)
