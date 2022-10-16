@@ -2,7 +2,7 @@
     import Map from "../../components/map.svelte"
     import { initializeApp } from "firebase/app";
     import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
-    import { getStorage, ref as storeRef, uploadBytes } from "firebase/storage";
+    import { getStorage, ref as storeRef, uploadBytes, getDownloadURL } from "firebase/storage";
     import { onMount } from 'svelte';
     import { posts, userLoc, notifPerm, feedState, cos } from "../../stores.js"
 
@@ -202,13 +202,16 @@
                     uploadBytes(storageId, currentRecording).then((snapshot) => {
                         console.log('Uploaded a blob or file!');
                     });
-                    set(newPostRef, {
-                        user: 'TestUser',
-                        lat: lat,
-                        lng: lng,
-                        content: postContents,
-                        videoPath: storageId.fullPath
-                    });
+                    getDownloadURL(storageId)
+                        .then((url => {
+                            set(newPostRef, {
+                                user: 'TestUser',
+                                lat: lat,
+                                lng: lng,
+                                content: postContents,
+                                videoPath: url
+                            });
+                        }))
                 }
                 uiHide(uiAddPin)
                 uiHide(uiPost)
