@@ -14,6 +14,9 @@
     posts.set({id: {loading: true}})
 
     let currentRecording;
+    let camera;
+    let cameraMode = 'back';
+    let currentStream
 
     let uiLogo;
     let uiCoS;
@@ -71,15 +74,43 @@
 
         uiAddMedia.addEventListener("click", (event) => {
             event.stopPropagation()
-            navigator.mediaDevices.getUserMedia({
-                video: true,
+            camera = navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment'
+                },
                 audio: true
-        }).then((stream) => {
-            uiPreview.srcObject = stream;
+            }).then((stream) => {
+                currentStream = stream
+                uiPreview.srcObject = currentStream;
                 mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
                 uiShow(uiRecordMedia);
             })
         }, false)
+
+        uiPreview.addEventListener("click", (event) => {
+            event.stopPropagation()
+            if (cameraMode === 'front') {
+                camera = navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment'
+                    },
+                    audio: true
+                }).then((stream) => {
+                    currentStream = stream;
+                    uiPreview.srcObject = currentStream;
+                })
+            } else if(cameraMode === 'back') {
+                camera = navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user'
+                    },
+                    audio: true
+                }).then((stream) => {
+                    currentStream = stream;
+                    uiPreview.srcObject = currentStream;
+                })
+            }
+        })
 
         uiVideo.addEventListener("click", (event) => {
             event.stopPropagation()
@@ -425,7 +456,7 @@
             {#key $posts[currentPostId]}
                 {#if $posts[currentPostId]}
                     {#if $posts[currentPostId].videoPath}
-                        <div class="w-full h-4/6 flex pt-4 justify-center mb-4">
+                        <div class="w-full h-fit flex pt-4 justify-center mb-4">
                             <p class="absolute text-gray-100">Loading...</p>
                             <div class="w-max h-max rounded-lg overflow-hidden relative">
                                 <video id="pinVideo" class="w-full h-full max-w-xs max-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop></video>
@@ -519,6 +550,7 @@
 
         <!--recordMedia-->
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
+            <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
             <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
                 <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted></video>
             </div>
