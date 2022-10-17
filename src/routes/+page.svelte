@@ -125,7 +125,7 @@
 
 
 
-<div class="bg-slate-100 w-full h-screen fixed flex flex-col gap-y-2 justify-center items-center">
+<div class="bg-slate-100 w-full h-screen fixed flex flex-col gap-y-2 pt-2 items-center">
     {#if wrongKey}
         <div class="w-full max-w-sm h-full max-h-sm rounded-md text-gray-50 text-lg leading-7 font-extrabold bg-gray-500/50 flex justify-center items-center absolute">Invalid Key</div>
     {/if}
