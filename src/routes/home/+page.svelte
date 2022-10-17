@@ -18,6 +18,8 @@
     let cameraMode = 'back';
     let currentStream
     let mediaStream;
+    let recorder;
+    let recording = false;
     let recordingTimeMS = 5000;
 
     let uiLogo;
@@ -74,7 +76,7 @@
 
         uiPreview.addEventListener("click", (event) => {
             event.stopPropagation()
-            if (cameraMode === 'front') {
+            if (cameraMode === 'front' && !recording) {
                 cameraMode = 'back';
                 camera = navigator.mediaDevices.getUserMedia({
                     video: {
@@ -85,7 +87,7 @@
                     currentStream = stream;
                     uiPreview.srcObject = currentStream;
                 })
-            } else if(cameraMode === 'back') {
+            } else if(cameraMode === 'back' && !recording) {
                 cameraMode = 'front'
                 camera = navigator.mediaDevices.getUserMedia({
                     video: {
@@ -269,8 +271,8 @@
 
     function record() {
         mediaStream.then(() => {
-            uiVideo.classList.remove('bg-gray-700')
-            uiVideo.classList.add('bg-red-500')
+            uiHide(uiAddPinClose);
+            recording = true;
             startRecording(uiPreview.captureStream(), recordingTimeMS)
                 .then((recordedChunks) => {
                     let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
@@ -278,8 +280,8 @@
                     uiRecording.src = URL.createObjectURL(recordedBlob);
                     uiShow(uiApproveMedia);
                     console.log(recordedBlob.size);
-                    uiVideo.classList.remove('bg-red-500')
-                    uiVideo.classList.add('bg-gray-700')
+                    uiShow(uiAddPinClose)
+                    recording = false
                 }).catch((error) => {
                 if (error.name === "NotFoundError") {
                     console.log("Camera or microphone not found. Can't record.");
@@ -300,15 +302,14 @@
         }).then((stream) => {
             currentStream = stream
             uiPreview.srcObject = currentStream;
-            mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+            if (!mediaStream) {
+                mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+            }
             uiShow(uiRecordMedia);
         })
     }
 
     function exitPin() {
-        if (mediaStream) {
-            stopRecording(currentStream);
-        }
         currentRecording = null
         if (document.getElementById('recording')) {
             document.getElementById('recording').src = "";
@@ -396,7 +397,7 @@
     }
 
     function startRecording(stream, length) {
-        let recorder = new MediaRecorder(stream);
+        recorder = new MediaRecorder(stream);
         let data = [];
         recorder.ondataavailable = (event) => data.push(event.data);
         recorder.start();
@@ -413,7 +414,7 @@
             },
         );
 
-        return Promise.all([recorded, stopped]).then(() => data);
+        return Promise.any([recorded, stopped]).then(() => data);
     }
 
     function stopRecording(stream) {
@@ -577,7 +578,9 @@
 
         <!--recordMedia-->
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
-            <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
+            {#if !recording}
+                <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
+            {/if}
             <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
                 <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted></video>
             </div>
@@ -586,9 +589,16 @@
                     <img src="camera.svg" alt="Take Picture">
                     <img src="disabled.svg" alt="Disabled" class="absolute">
                 </div>
-                <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full" on:click={record}>
-                    <img src="video.svg" alt="Take Video">
-                </div>
+                {#if !recording}
+                    <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full" on:click={record}>
+                        <img src="video.svg" alt="Take Video">
+                    </div>
+                {/if}
+                {#if recording}
+                    <div id="stopVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-red-500 rounded-full" on:click={() => stopRecording(uiPreview.captureStream())}>
+                        <img src="video.svg" alt="Take Video">
+                    </div>
+                {/if}
             </div>
         </div>
 
