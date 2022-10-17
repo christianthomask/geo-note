@@ -90,6 +90,7 @@
         uiPreview.addEventListener("click", (event) => {
             event.stopPropagation()
             if (cameraMode === 'front') {
+                cameraMode = 'back';
                 camera = navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'environment'
@@ -100,6 +101,7 @@
                     uiPreview.srcObject = currentStream;
                 })
             } else if(cameraMode === 'back') {
+                cameraMode = 'front'
                 camera = navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'user'
