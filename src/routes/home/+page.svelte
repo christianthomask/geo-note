@@ -17,6 +17,8 @@
     let camera;
     let cameraMode = 'back';
     let currentStream
+    let mediaStream;
+    let recordingTimeMS = 5000;
 
     let uiLogo;
     let uiCoS;
@@ -62,8 +64,6 @@
         uiApproveMedia = document.getElementById('approveMedia');
         uiAcceptMedia = document.getElementById('acceptMedia');
         uiRejectMedia = document.getElementById('rejectMedia');
-        let recordingTimeMS = 5000;
-        let mediaStream;
         uiInitAnim(uiMenu);
         uiInitAnim(uiPin);
 
@@ -71,21 +71,6 @@
             location.reload();
             return false;
         })
-
-        uiAddMedia.addEventListener("click", (event) => {
-            event.stopPropagation()
-            camera = navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'environment'
-                },
-                audio: true
-            }).then((stream) => {
-                currentStream = stream
-                uiPreview.srcObject = currentStream;
-                mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
-                uiShow(uiRecordMedia);
-            })
-        }, false)
 
         uiPreview.addEventListener("click", (event) => {
             event.stopPropagation()
@@ -114,35 +99,17 @@
             }
         })
 
-        uiVideo.addEventListener("click", (event) => {
-            event.stopPropagation()
-            mediaStream.then(() => {
-                uiVideo.classList.remove('bg-gray-700')
-                uiVideo.classList.add('bg-red-500')
-                startRecording(uiPreview.captureStream(), recordingTimeMS)
-                    .then((recordedChunks) => {
-                        let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
-                        currentRecording = recordedBlob;
-                        uiRecording.src = URL.createObjectURL(recordedBlob);
-                        uiShow(uiApproveMedia);
-                        console.log(recordedBlob.size);
-                        uiVideo.classList.remove('bg-red-500')
-                        uiVideo.classList.add('bg-gray-700')
-                    }).catch((error) => {
-                    if (error.name === "NotFoundError") {
-                        console.log("Camera or microphone not found. Can't record.");
-                    } else {
-                        console.log(error);
-                    }
-                });
-            })
-        });
-
         uiAcceptMedia.addEventListener("click", (event) => {
             event.stopPropagation()
             uiRecording.src = "";
             uiHide(uiApproveMedia);
             uiHide(uiRecordMedia);
+        })
+
+        uiRejectMedia.addEventListener("click", (event) => {
+            event.stopPropagation()
+            uiRecording.src = "";
+            uiHide(uiApproveMedia);
         })
 
 
@@ -256,6 +223,9 @@
                             }))
                     })
                 }
+                if(document.getElementById('pinVideo')) {
+                    document.getElementById('pinVideo').src = "";
+                }
                 uiHide(uiAddPin)
                 uiHide(uiPost)
                 uiShrink(uiAddPinClose);
@@ -279,7 +249,9 @@
     }
 
     function closePost() {
-        document.getElementById('pinVideo').src = "";
+        if (document.getElementById('pinVideo')) {
+            document.getElementById('pinVideo').src = "";
+        }
         uiHide(uiPost)
         uiShrink(uiComment);
         uiShrink(uiPostClose);
@@ -295,7 +267,60 @@
         uiShow(uiPost);
     }
 
+    function record() {
+        mediaStream.then(() => {
+            uiVideo.classList.remove('bg-gray-700')
+            uiVideo.classList.add('bg-red-500')
+            startRecording(uiPreview.captureStream(), recordingTimeMS)
+                .then((recordedChunks) => {
+                    let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+                    currentRecording = recordedBlob;
+                    uiRecording.src = URL.createObjectURL(recordedBlob);
+                    uiShow(uiApproveMedia);
+                    console.log(recordedBlob.size);
+                    uiVideo.classList.remove('bg-red-500')
+                    uiVideo.classList.add('bg-gray-700')
+                }).catch((error) => {
+                if (error.name === "NotFoundError") {
+                    console.log("Camera or microphone not found. Can't record.");
+                } else {
+                    console.log(error);
+                }
+            });
+        })
+    }
+
+    function addMedia() {
+        console.log('click')
+        camera = navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: 'environment'
+            },
+            audio: true
+        }).then((stream) => {
+            currentStream = stream
+            uiPreview.srcObject = currentStream;
+            mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+            uiShow(uiRecordMedia);
+        })
+    }
+
     function exitPin() {
+        if (mediaStream) {
+            stopRecording(currentStream);
+        }
+        currentRecording = null
+        if (document.getElementById('recording')) {
+            document.getElementById('recording').src = "";
+        }
+        if (document.getElementById('preview')) {
+            document.getElementById('preview').src = "";
+        }
+        if (document.getElementById('finalPreview')) {
+            document.getElementById('finalPreview').src = "";
+        }
+        uiHide(uiApproveMedia)
+        uiHide(uiRecordMedia)
         uiHide(uiAddPin)
         uiHide(uiPost)
         uiShrink(uiAddPinClose);
@@ -513,7 +538,7 @@
 
                     <!--addMedia-->
                     <div class="flex flex-col items-center gap-2">
-                        <div id="addMedia" class="cursor-pointer w-16 h-16 rounded-full bg-gray-700 flex justify-center items-center">
+                        <div id="addMedia" class="cursor-pointer w-16 h-16 rounded-full bg-gray-700 flex justify-center items-center" on:click={addMedia}>
                             <img src="addMedia.svg" alt="Add Media">
                         </div>
                         <p class="text-lg leading-7 font-medium test-gray-700">Add a Photo or Video</p>
@@ -546,7 +571,7 @@
         </div>
 
         <!--addPinClose-->
-        <div id="addPinClose" class="cursor-pointer z-20 w-28 h-28 flex justify-center items-center bg-gray-300 absolute top-0 right-0 z-20 rounded-tl-full rounded-bl-full rounded-br-full scale-0 origin-top-right ease-springy" on:click={exitPin}>
+        <div id="addPinClose" class="cursor-pointer z-50 w-28 h-28 flex justify-center items-center bg-gray-300 absolute top-0 right-0 rounded-tl-full rounded-bl-full rounded-br-full scale-0 origin-top-right ease-springy" on:click={exitPin}>
             <img src="close.svg" alt="Close">
         </div>
 
@@ -561,7 +586,7 @@
                     <img src="camera.svg" alt="Take Picture">
                     <img src="disabled.svg" alt="Disabled" class="absolute">
                 </div>
-                <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full">
+                <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full" on:click={record}>
                     <img src="video.svg" alt="Take Video">
                 </div>
             </div>
