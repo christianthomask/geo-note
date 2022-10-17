@@ -21,7 +21,6 @@
     let cameraMode = 'back';
     let currentStream
     let mediaStream;
-    let captureStream;
     let recorder;
     let recording = false;
     let recordingTimeMS = 5000;
@@ -127,6 +126,18 @@
 
         uiRejectMedia.addEventListener("click", (event) => {
             event.stopPropagation()
+            camera = navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment'
+                },
+                audio: true
+            }).then((stream) => {
+                currentStream = stream
+                uiPreview.srcObject = currentStream;
+                if (!mediaStream) {
+                    mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+                }
+            })
             uiRecording.src = "";
             uiHide(uiApproveMedia);
         })
@@ -306,7 +317,7 @@
         mediaStream.then(() => {
             uiHide(uiAddPinClose);
             recording = true;
-            startRecording(captureStream, recordingTimeMS)
+            startRecording(uiPreview.captureStream(), recordingTimeMS)
                 .then((recordedChunks) => {
                     let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
                     currentRecording = recordedBlob;
@@ -327,7 +338,6 @@
 
     function addMedia() {
         console.log('click')
-        captureStream = uiPreview.captureStream()
         camera = navigator.mediaDevices.getUserMedia({
             video: {
                 facingMode: 'environment'
@@ -444,11 +454,12 @@
         let recorded = wait(length).then(() => {
                 if (recorder.state === "recording") {
                     recorder.stop();
+                    stopped.resolve();
                 }
             },
         );
 
-        return Promise.any([recorded, stopped]).then(() => data);
+        return Promise.any([stopped]).then(() => data);
     }
 
     function stopRecording(stream) {
