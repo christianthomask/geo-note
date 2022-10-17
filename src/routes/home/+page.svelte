@@ -532,10 +532,10 @@
                 <video id="recording" class="w-full h-full max-w-xs max-h-xs" autoplay loop></video>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
-                <div id="rejectMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full" on:click={submitPost}>
+                <div id="rejectMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
                     <img src="back.svg" alt="Back">
                 </div>
-                <div id="acceptMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-blue-500 rounded-full" on:click={submitPost}>
+                <div id="acceptMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-blue-500 rounded-full">
                     <img src="checkbox-fill.svg" alt="Accept">
                 </div>
             </div>
