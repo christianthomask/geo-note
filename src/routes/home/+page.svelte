@@ -1,11 +1,13 @@
 <script>
     import Map from "../../components/map.svelte"
     import { initializeApp } from "firebase/app";
-    import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
+    import {getDatabase, ref as fireRef, set, push, onValue, get, ref} from "firebase/database";
     import { getStorage, ref as storeRef, uploadBytes, getDownloadURL } from "firebase/storage";
     import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
     import { onMount } from 'svelte';
     import { posts, feedState, cos } from "../../stores.js"
+
+    let uid;
 
     let loc
     let lat = '0'
@@ -75,7 +77,7 @@
             if (user) {
                 // User is signed in, see docs for a list of available properties
                 // https://firebase.google.com/docs/reference/js/firebase.User
-                const uid = user.uid;
+                uid = user.uid;
                 console.log(uid);
                 // ...
             } else {
@@ -226,9 +228,14 @@
                 post.value = "";
                 const newPostRef = push(postListRef);
                 console.log(newPostRef);
+                let username;
+                get(ref(db, 'users/' + uid)).then((snapshot) => {
+                    let usr = snapshot.val();
+                    username = usr.username
+                })
                 if (!currentRecording) {
                     set(newPostRef, {
-                        user: 'TestUser',
+                        user: username,
                         lat: lat,
                         lng: lng,
                         content: postContents

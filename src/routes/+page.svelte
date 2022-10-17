@@ -52,7 +52,7 @@
                         username: username,
                         email: email,
                         password: password,
-                        createDate: dayjs().format('MM-DD-YYY')
+                        createDate: dayjs().format('MM-DD-YYYY')
                     })
                     window.location.replace("https://www.gnote.app/home");
                 })
