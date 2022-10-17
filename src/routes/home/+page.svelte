@@ -259,8 +259,12 @@
                     }).then(() => {
                         getDownloadURL(storageId)
                             .then((url => {
+                                get(ref(db, 'users/' + uid)).then((snapshot) => {
+                                    let usr = snapshot.val();
+                                    username = usr.username
+                                })
                                 set(newPostRef, {
-                                    user: 'TestUser',
+                                    user: username,
                                     lat: lat,
                                     lng: lng,
                                     content: postContents,
