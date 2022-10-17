@@ -10,31 +10,35 @@
     let mapContainer;
     let postObj;
     let currentPosts = [];
+    let initialState
+    let geolocate;
 
     onMount(() => {
 
         const apiKey = '3lyTBC440REMO3MblUAD';
 
-        const initialState = { lng: 0, lat: 0, zoom: 14 };
+        function geoSuccess (pos) {
+            initialState = { lng: pos.coords.longitude, lat: pos.coords.latitude, zoom: 14 };
+            map = new Map({
+                container: mapContainer,
+                style: `https://api.maptiler.com/maps/streets/style.json?key=${apiKey}`,
+                center: [initialState.lng, initialState.lat],
+                zoom: initialState.zoom,
+            });
+            geolocate = new GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true,
+                showAccuracyCircle: false,
+            });
+            map.addControl(geolocate);
+            map.on('load', () => {
+                geolocate.trigger();
+            })
+        }
 
-        map = new Map({
-            container: mapContainer,
-            style: `https://api.maptiler.com/maps/streets/style.json?key=${apiKey}`,
-            center: [initialState.lng, initialState.lat],
-            zoom: initialState.zoom,
-        });
-
-        let geolocate = new GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true
-            },
-            trackUserLocation: true,
-            showAccuracyCircle: false,
-        });
-        map.addControl(geolocate);
-        map.on('load', () => {
-            geolocate.trigger();
-        })
+        navigator.geolocation.getCurrentPosition(geoSuccess)
 
         onValue(postRef, (snapshot) => {
             postObj = snapshot.val();
@@ -43,10 +47,10 @@
 
 
         setInterval(refreshMap, 5000);
-        geolocate.on('geolocate', (pos) => {
-            // console.log(pos);
-            userLoc.set(pos)
-        })
+        // geolocate.on('geolocate', (pos) => {
+        //     // console.log(pos);
+        //     userLoc.set(pos)
+        // })
 
         let CoS =  cos.subscribe((val) => {
             if(val !== 'unset') {

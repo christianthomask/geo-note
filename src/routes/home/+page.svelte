@@ -4,13 +4,13 @@
     import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
     import { getStorage, ref as storeRef, uploadBytes, getDownloadURL } from "firebase/storage";
     import { onMount } from 'svelte';
-    import { posts, userLoc, notifPerm, feedState, cos } from "../../stores.js"
+    import { posts, feedState, cos } from "../../stores.js"
 
     let loc
     let lat = '0'
     let lng = '0'
     let currentPostId;
-    let localPosts = {};
+    // let localPosts = {};
     posts.set({id: {loading: true}})
 
     let currentRecording;
@@ -63,7 +63,13 @@
         uiInitAnim(uiMenu);
         uiInitAnim(uiPin);
 
-        uiAddMedia.addEventListener("click", () => {
+        uiLogo.addEventListener("click", () => {
+            location.reload();
+            return false;
+        })
+
+        uiAddMedia.addEventListener("click", (event) => {
+            event.stopPropagation()
             navigator.mediaDevices.getUserMedia({
                 video: true,
                 audio: true
@@ -74,7 +80,8 @@
             })
         }, false)
 
-        uiVideo.addEventListener("click", () => {
+        uiVideo.addEventListener("click", (event) => {
+            event.stopPropagation()
             mediaStream.then(() => {
                 uiVideo.classList.remove('bg-gray-700')
                 uiVideo.classList.add('bg-red-500')
@@ -97,7 +104,8 @@
             })
         });
 
-        uiAcceptMedia.addEventListener("click", () => {
+        uiAcceptMedia.addEventListener("click", (event) => {
+            event.stopPropagation()
             uiRecording.src = "";
             uiHide(uiApproveMedia);
             uiHide(uiRecordMedia);
@@ -123,7 +131,7 @@
             // console.log('post');
             posts.set(snapshot.val());
             // console.log(posts);
-            refreshFeed();
+            // refreshFeed();
         })
     });
 
@@ -260,26 +268,26 @@
         uiInitAnim(uiPin);
     }
 
-    function refreshFeed() {
-        // console.log(localPosts);
-        // let listObj = {};
-        // console.log(Object.entries($posts))
-        Object.entries($posts).forEach((entry) => {
-            // console.log(entry);
-            // console.log(userLoc);
-            const distance = findPinDistance($userLoc.coords.latitude, entry[1].lat, $userLoc.coords.longitude, entry[1].lng);
-            if (distance < 1 && localPosts[entry[0]] === undefined) {
-                localPosts[entry[0]] = entry[1]
-                // console.log(listObj)
-                // console.log(Object.entries($localPosts)[entry[0]])
-            }
-            // localPosts.set(listObj);
-            // console.log($localPosts)
-            // console.log(Object.entries($localPosts)[entry[0]])
-            // postPostIds(localPosts);
-            cachePostIds(localPosts);
-        });
-    }
+    // function refreshFeed() {
+    //     // console.log(localPosts);
+    //     // let listObj = {};
+    //     // console.log(Object.entries($posts))
+    //     Object.entries($posts).forEach((entry) => {
+    //         // console.log(entry);
+    //         // console.log(userLoc);
+    //         const distance = findPinDistance($userLoc.coords.latitude, entry[1].lat, $userLoc.coords.longitude, entry[1].lng);
+    //         if (distance < 1 && localPosts[entry[0]] === undefined) {
+    //             localPosts[entry[0]] = entry[1]
+    //             // console.log(listObj)
+    //             // console.log(Object.entries($localPosts)[entry[0]])
+    //         }
+    //         // localPosts.set(listObj);
+    //         // console.log($localPosts)
+    //         // console.log(Object.entries($localPosts)[entry[0]])
+    //         // postPostIds(localPosts);
+    //         cachePostIds(localPosts);
+    //     });
+    // }
 
     function findPinDistance(lat1, lat2, lon1, lon2) {
 
@@ -422,7 +430,7 @@
                 {/if}
             {/if}
 
-            <div class="w-full max-w-sm h-fit flex flex-col m-auto">
+            <div class="w-full max-w-sm h-fit flex flex-col mx-auto">
 
                 <!--Poster-->
                 <div class="w-fit h-fit flex flex-col px-6 gap-2 pt-7">
