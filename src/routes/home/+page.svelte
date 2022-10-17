@@ -19,6 +19,7 @@
     let uiCoS;
     let uiMenu;
     let uiPin;
+    let uiPinVideo;
     let uiPost;
     let uiPostClose;
     let uiComment;
@@ -245,6 +246,7 @@
     }
 
     function closePost() {
+        document.getElementById('pinVideo').src = "";
         uiHide(uiPost)
         uiShrink(uiComment);
         uiShrink(uiPostClose);
@@ -420,20 +422,23 @@
         <div id="post" class="w-full max-w-3xl h-screen px-3 fixed flex flex-col z-20 bg-gray-50 hidden">
 
             <!--Media-->
-            {#if $posts[currentPostId]}
-                {#if $posts[currentPostId].videoPath}
-                    <div class="w-full h-max flex justify-center items-center mb-4 pt-7">
-                        <div class="w-max h-max rounded-lg overflow-hidden relative">
-                            <video id="pinVideo" class="w-full h-full max-w-xs max-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop></video>
+            {#key $posts[currentPostId]}
+                {#if $posts[currentPostId]}
+                    {#if $posts[currentPostId].videoPath}
+                        <div class="w-full h-4/6 flex pt-4 justify-center mb-4">
+                            <p class="absolute text-gray-100">Loading...</p>
+                            <div class="w-max h-max rounded-lg overflow-hidden relative">
+                                <video id="pinVideo" class="w-full h-full max-w-xs max-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop></video>
+                            </div>
                         </div>
-                    </div>
+                    {/if}
                 {/if}
-            {/if}
+            {/key}
 
             <div class="w-full max-w-sm h-fit flex flex-col mx-auto">
 
                 <!--Poster-->
-                <div class="w-fit h-fit flex flex-col px-6 gap-2 pt-7">
+                <div class="w-fit h-fit flex flex-col px-6 gap-2">
                     <img src="yo.png" alt="Yo" class="w-16 h-16 rounded-full">
                     {#if $posts[currentPostId]}
                         <h2 class="text-lg leading-7 font-bold text-gray-700">{$posts[currentPostId].user}'s note:</h2>
@@ -443,7 +448,9 @@
                 <!--postContent-->
                 <div class="w-full h-4/6 py-3 px-6">
                     {#if $posts[currentPostId]}
-                        <p class="text-lg-leading-7 font-medium text-gray-700 mb-2">{$posts[currentPostId].content}</p>
+                        <div class="w-fit h-max max-h-xs">
+                            <p class="text-lg-leading-7 font-medium text-gray-700 mb-2">{$posts[currentPostId].content}</p>
+                        </div>
                         <p class="text-lg-leading-7 font-medium text-gray-700">lat: {$posts[currentPostId].lat}</p>
                         <p class="text-lg-leading-7 font-medium text-gray-700">lng: {$posts[currentPostId].lng}</p>
                     {/if}
