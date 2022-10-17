@@ -2,12 +2,17 @@
 
     import { onMount } from 'svelte';
     import { initializeApp } from "firebase/app";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,} from "firebase/auth";
-	import { get } from 'firebase/database';
-	import { connectStorageEmulator } from 'firebase/storage';
+    import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+    } from "firebase/auth";
+	import { getDatabase, ref, get, set } from 'firebase/database';
+    import dayjs from 'dayjs'
 
     let signedIn;
-
+    let wrongKey = false;
     let authState ="signIn";
 
     const firebaseConfig = {
@@ -24,21 +29,47 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
-    function createUser(){
+    const db = getDatabase();
+    let key;
+    get(ref(db, 'password')).then((snapshot) => {
+        key = snapshot.val();
+        // console.log(key);
+    })
+
+    let deferredPrompt;
+
+    function createUser() {
         const email = document.getElementById("createEmail").value;
         const password = document.getElementById("createPassword").value;
-        createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Signed in 
-            const user = userCredential.user;
-            // ...
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // ..
-        });
-
+        const username = document.getElementById("createUsername").value;
+        const checkKey = document.getElementById("genericPass").value;
+        if (checkKey === key) {
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const newUserRef = ref(db, "users/" + user.uid);
+                    set(newUserRef,{
+                        username: username,
+                        email: email,
+                        password: password,
+                        createDate: dayjs().format('MM-DD-YYY');
+                    })
+                    window.location.replace("https://www.gnote.app/home");
+                })
+                .catch((error) => {
+                    console.log(error.code);
+                    console.log(error.message);
+                    // ..
+                });
+        }else if (checkKey !== key) {
+            wrongKey = true;
+            setTimeout(() => {
+                wrongKey = false;
+            }, 500)
+        }
+        document.getElementById("createEmail").value = "";
+        document.getElementById("createPassword").value = "";
+        document.getElementById("genericPass").value = "";
     }
     
     function signInUser(){
@@ -46,40 +77,48 @@
         const password = document.getElementById("password").value;
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            // Signed in 
-            const user = userCredential.user;
-            // ...
+            window.location.replace("https://www.gnote.app/home");
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
+            console.log(error.code);
+            console.log(error.message);
         });
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
      }
+
+    async function installApp() {
+        if (deferredPrompt !== null) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredPrompt = null;
+            }
+        }
+    }
 
 
      
 
     onMount(() => {
-        let deferredPrompt;
 
         window.addEventListener('beforeinstallprompt', (e) => {
             deferredPrompt = e;
         });
 
-        const installApp = document.getElementById('installApp');
-        const signIn = document.getElementById('signIn');
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, see docs for a list of available properties
+                // https://firebase.google.com/docs/reference/js/firebase.User
+                const uid = user.uid;
+                window.location.replace("https://www.gnote.app/home");
+                // ...
+            } else {
+                // User is signed out
+            }
+        });
 
-
-        // installApp.addEventListener('click', async () => {
-        //     if (deferredPrompt !== null) {
-        //         deferredPrompt.prompt();
-        //         const { outcome } = await deferredPrompt.userChoice;
-        //         if (outcome === 'accepted') {
-        //             deferredPrompt = null;
-        //         }
-        //     }
-        // });
-    })
+    });
 
 
 </script>
@@ -87,12 +126,15 @@
 
 
 <div class="bg-slate-100 w-full h-screen fixed flex flex-col gap-y-2 justify-center items-center">
+    {#if wrongKey}
+        <div class="w-full max-w-sm h-full max-h-sm rounded-md text-gray-50 text-lg leading-7 font-extrabold bg-gray-500/50 flex justify-center items-center absolute">Invalid Key</div>
+    {/if}
     {#if !signedIn && authState ==="signIn"}
         <div class="bg-slate-200 w-fit max-w-sm h-fit rounded-md p-6 flex flex-col gap-4">
             <h1 class="text-lg leading-7 font-extrabold">Hi! 👋</h1>
             <h2 class="text-lg leading-7 font-medium">Welcome to GeoNote, also known as gNote!</h2>
-            <input type="text" id="email" placeholder="Email">
-            <input type="text" id="password" placeholder="Password">
+            <input class="rounded-md" type="email" id="email" placeholder="Email">
+            <input class="rounded-md" type="password" id="password" placeholder="Password">
               <div class="w-full flex justify-center">
                 <div class="cursor-pointer w-fit h-fit px-8 py-2 bg-yellow-300 rounded-lg text-lg leading-7 font-extrabold" on:click={signInUser}>
                     Sign In
@@ -105,8 +147,10 @@
         <div class="bg-slate-200 w-fit max-w-sm h-fit rounded-md p-6 flex flex-col gap-4">
             <h1 class="text-lg leading-7 font-extrabold">Hi! 👋</h1>
             <h2 class="text-lg leading-7 font-medium">Welcome to GeoNote, also known as gNote!</h2>
-            <input type="text" id="createEmail" placeholder="Email">
-            <input type="text" id="createPassword" placeholder="Password">
+            <input class="rounded-md" type="email" id="createEmail" placeholder="Email">
+            <input class="rounded-md" type="password" id="createPassword" placeholder="Password">
+            <input class="rounded-md" type="text" id="createUsername" placeholder="Username">
+            <input class="rounded-md" type="password" id="genericPass" placeholder="Invite Key">
               <div class="w-full flex justify-center">
                 <div class="cursor-pointer w-fit h-fit px-8 py-2 bg-yellow-300 rounded-lg text-lg leading-7 font-extrabold" on:click={createUser}>
                     Create User
@@ -117,10 +161,9 @@
     {/if}
     {#if signedIn}
         <div class="bg-slate-200 w-fit max-w-sm h-fit rounded-md p-6 flex flex-col gap-4">
-            <h1 class="text-lg leading-7 font-extrabold">Hi! 👋</h1>
-            <p class="">Welcome to GeoNote, also know as gNote! This app works best when installed, if you'd like to give it a whirl, tap below!</p>
+            <p class="">This app works best when installed, if you'd like to give it a whirl, tap below!</p>
             <div class="w-full flex justify-center">
-                <div class="cursor-pointer w-fit h-fit px-8 py-2 bg-yellow-300 rounded-lg text-lg leading-7 font-extrabold" id="installApp">
+                <div class="cursor-pointer w-fit h-fit px-8 py-2 bg-yellow-300 rounded-lg text-lg leading-7 font-extrabold" on:click={installApp}>
                     Install App
                 </div>
             </div>

@@ -3,6 +3,7 @@
     import { initializeApp } from "firebase/app";
     import {getDatabase, ref as fireRef, set, push, onValue} from "firebase/database";
     import { getStorage, ref as storeRef, uploadBytes, getDownloadURL } from "firebase/storage";
+    import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
     import { onMount } from 'svelte';
     import { posts, feedState, cos } from "../../stores.js"
 
@@ -18,6 +19,7 @@
     let cameraMode = 'back';
     let currentStream
     let mediaStream;
+    let captureStream;
     let recorder;
     let recording = false;
     let recordingTimeMS = 5000;
@@ -68,6 +70,19 @@
         uiRejectMedia = document.getElementById('rejectMedia');
         uiInitAnim(uiMenu);
         uiInitAnim(uiPin);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, see docs for a list of available properties
+                // https://firebase.google.com/docs/reference/js/firebase.User
+                const uid = user.uid;
+                console.log(uid);
+                // ...
+            } else {
+                // User is signed out
+                window.location.replace("https://www.gnote.app");
+            }
+        });
 
         uiLogo.addEventListener("click", () => {
             location.reload();
@@ -154,6 +169,7 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app)
+    const auth = getAuth();
     const postListRef = fireRef(db, '/posts');
     // Get a reference to the storage service, which is used to create references in your storage bucket
     const storage = getStorage();
@@ -161,21 +177,31 @@
     // Create a storage reference from our storage service
 
 
-    let feedExpandedState = {state: 'feed', class:"h-1/2", width:"w-40"};
-    function togglePostState(state) {
-        if (feedExpandedState.state === 'feed' && state !== 'post') {
-            feedExpandedState.class = "h-3/5";
-            feedExpandedState.state = 'add';
-            feedExpandedState.width = "w-10";
-        } else if (feedExpandedState.state === 'add' || feedExpandedState.state === 'post' && state !== 'post') {
-            feedExpandedState.class = "h-1/2";
-            feedExpandedState.state = 'feed';
-            feedExpandedState.width = "w-40";
-        } else if (state === 'post') {
-            feedExpandedState.class = "h-3/5";
-            feedExpandedState.state = 'post';
-            feedExpandedState.width = "w-10";
-        }
+    // let feedExpandedState = {state: 'feed', class:"h-1/2", width:"w-40"};
+    // function togglePostState(state) {
+    //     if (feedExpandedState.state === 'feed' && state !== 'post') {
+    //         feedExpandedState.class = "h-3/5";
+    //         feedExpandedState.state = 'add';
+    //         feedExpandedState.width = "w-10";
+    //     } else if (feedExpandedState.state === 'add' || feedExpandedState.state === 'post' && state !== 'post') {
+    //         feedExpandedState.class = "h-1/2";
+    //         feedExpandedState.state = 'feed';
+    //         feedExpandedState.width = "w-40";
+    //     } else if (state === 'post') {
+    //         feedExpandedState.class = "h-3/5";
+    //         feedExpandedState.state = 'post';
+    //         feedExpandedState.width = "w-10";
+    //     }
+    // }
+
+    function signOutUser() {
+        signOut(auth).then(() => {
+            // Sign-out successful.
+            window.location.replace("https://www.gnote.app");
+        }).catch((error) => {
+            // An error happened.
+            console.log(error);
+        });
     }
 
     let getLocationPromise = () => {
@@ -273,7 +299,7 @@
         mediaStream.then(() => {
             uiHide(uiAddPinClose);
             recording = true;
-            startRecording(uiPreview.captureStream(), recordingTimeMS)
+            startRecording(captureStream, recordingTimeMS)
                 .then((recordedChunks) => {
                     let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
                     currentRecording = recordedBlob;
@@ -294,6 +320,7 @@
 
     function addMedia() {
         console.log('click')
+        captureStream = uiPreview.captureStream()
         camera = navigator.mediaDevices.getUserMedia({
             video: {
                 facingMode: 'environment'
@@ -467,7 +494,7 @@
         </div>
 
         <!--Menu-->
-        <div id="menu" class="cursor-not-allowed w-28 h-28 flex justify-center items-center bg-gray-300 absolute bottom-0 right-0 z-10 rounded-tr-full rounded-bl-full rounded-tl-full scale-0 origin-bottom-right ease-springy">
+        <div id="menu" class="cursor-not-allowed w-28 h-28 flex justify-center items-center bg-gray-300 absolute bottom-0 right-0 z-10 rounded-tr-full rounded-bl-full rounded-tl-full scale-0 origin-bottom-right ease-springy" on:click={signOutUser}>
             <img src="menu.svg" alt="Menu">
             <img src="disabled.svg" alt="Disabled" class="absolute">
         </div>
@@ -487,7 +514,7 @@
                         <div class="w-full h-fit flex pt-4 justify-center mb-4">
                             <p class="absolute text-gray-100">Loading...</p>
                             <div class="w-max h-max rounded-lg overflow-hidden relative">
-                                <video id="pinVideo" class="w-full h-full max-w-xs max-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop></video>
+                                <video id="pinVideo" class="w-full h-full max-w-xs max-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
                             </div>
                         </div>
                     {/if}
@@ -551,7 +578,7 @@
 
                     <!--finalPreview-->
                     <div class="w-fit h-fit rounded-lg overflow-hidden relative">
-                        <video id="finalPreview" class="w-full h-full max-w-xs max-h-xs" src="{URL.createObjectURL(currentRecording)}" autoplay loop muted></video>
+                        <video id="finalPreview" class="w-full h-full max-w-xs max-h-xs" src="{URL.createObjectURL(currentRecording)}" autoplay loop muted playsinline></video>
                     </div>
 
                 {/if}
@@ -582,7 +609,7 @@
                 <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
             {/if}
             <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
-                <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted></video>
+                <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted playsinline></video>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="takePicture" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
@@ -605,7 +632,7 @@
         <!--approveMedia-->
         <div id="approveMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-40 bg-gray-50 hidden">
             <div class="w-fit h-fit rounded-lg overflow-hidden relative">
-                <video id="recording" class="w-full h-full max-w-xs max-h-xs" autoplay loop></video>
+                <video id="recording" class="w-full h-full max-w-xs max-h-xs" autoplay loop playsinline></video>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="rejectMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
