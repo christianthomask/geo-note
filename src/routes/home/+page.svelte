@@ -102,6 +102,10 @@
                     audio: true
                 }).then((stream) => {
                     currentStream = stream;
+                    if(recorder && recorder.state === 'recording') {
+                        recorder.stop()
+                    }
+                    recorder = new MediaRecorder(captureStream);
                     uiPreview.srcObject = currentStream;
                 })
             } else if(cameraMode === 'back' && !recording) {
@@ -113,6 +117,10 @@
                     audio: true
                 }).then((stream) => {
                     currentStream = stream;
+                    if(recorder && recorder.state === 'recording') {
+                        recorder.stop()
+                    }
+                    recorder = new MediaRecorder(captureStream);
                     uiPreview.srcObject = currentStream;
                 })
             }
@@ -134,10 +142,12 @@
                 audio: true
             }).then((stream) => {
                 currentStream = stream
-                uiPreview.srcObject = currentStream;
-                if (!mediaStream) {
-                    mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+                if(recorder && recorder.state === 'recording') {
+                    recorder.stop()
                 }
+                recorder = new MediaRecorder(captureStream);
+                uiPreview.srcObject = currentStream;
+                mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
             })
             uiRecording.src = "";
             uiHide(uiApproveMedia);
@@ -320,8 +330,8 @@
     function record() {
         mediaStream.then(() => {
             uiHide(uiAddPinClose);
-            recording = true;
-
+            uiHide(document.getElementById('takeVideo'))
+            uiShow(document.getElementById('stopVideo'))
             startRecording(recorder, recordingTimeMS)
                 .then((recordedChunks) => {
                     let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
@@ -330,7 +340,8 @@
                     uiShow(uiApproveMedia);
                     console.log(recordedBlob.size);
                     uiShow(uiAddPinClose)
-                    recording = false
+                    uiHide(document.getElementById('stopVideo'))
+                    uiShow(document.getElementById('takeVideo'))
                 }).catch((error) => {
                 if (error.name === "NotFoundError") {
                     console.log("Camera or microphone not found. Can't record.");
@@ -350,11 +361,14 @@
             audio: true
         }).then((stream) => {
             currentStream = stream
+            captureStream = uiPreview.captureStream()
             uiPreview.srcObject = currentStream;
-            recorder = new MediaRecorder(uiPreview.captureStream());
-            if (!mediaStream) {
-                mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+            if(recorder && recorder.state === 'recording') {
+                recorder.stop()
             }
+            recorder = new MediaRecorder(captureStream);
+            mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+
             uiShow(uiRecordMedia);
         })
     }
@@ -505,7 +519,7 @@
 
 <div class="w-full max-w-3xl m-auto">
     <div id="loadingSplash" class="absolute bg-gray-50 w-full h-full z-50 max-w-3xl flex justify-center items-center">
-        <p class="text-lg leading-7 font-extrabold text-gray-700">Loading...</p>
+        <p class="text-lg leading-7 font-extrabold text-blue-500">Loading...</p>
     </div>
 
     <div class="w-full max-w-3xl h-screen fixed flex flex-col bg-white overflow-x-hidden">
@@ -638,9 +652,7 @@
 
         <!--recordMedia-->
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
-            {#if !recording}
-                <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
-            {/if}
+            <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
             <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
                 <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted playsinline></video>
             </div>
@@ -649,16 +661,12 @@
                     <img src="camera.svg" alt="Take Picture">
                     <img src="disabled.svg" alt="Disabled" class="absolute">
                 </div>
-                {#if !recording}
-                    <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full" on:click={record}>
-                        <img src="video.svg" alt="Take Video">
-                    </div>
-                {/if}
-                {#if recording}
-                    <div id="stopVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-red-500 rounded-full" on:click={() => stopRecording(uiPreview.captureStream())}>
-                        <img src="video.svg" alt="Take Video">
-                    </div>
-                {/if}
+                <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full" on:click={record}>
+                    <img src="video.svg" alt="Take Video">
+                </div>
+                <div id="stopVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-red-500 rounded-full hidden" on:click={() => stopRecording(captureStream)}>
+                    <img src="video.svg" alt="Take Video">
+                </div>
             </div>
         </div>
 
