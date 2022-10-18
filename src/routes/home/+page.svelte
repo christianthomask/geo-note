@@ -567,7 +567,7 @@
                 <!--postContent-->
                 <div class="w-full h-4/6 py-3 px-6">
                     {#if $posts[currentPostId]}
-                        <div class="w-full h-8">
+                        <div class="w-full h-16 overflow-y-scroll">
                             <p class="text-lg-leading-7 font-medium text-gray-700 mb-2">{$posts[currentPostId].content}</p>
                         </div>
                     {/if}
