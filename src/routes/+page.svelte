@@ -37,6 +37,10 @@
         // console.log(key);
     })
 
+    if(Cookies.get('authcookie') && Cookies.get('authcookie') !== 'false'){
+        goto('/home');
+    }
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
             // User is signed in, see docs for a list of available properties
