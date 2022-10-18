@@ -12,7 +12,7 @@
 	import { getDatabase, ref, get, set } from 'firebase/database';
     import dayjs from 'dayjs'
 
-    let signedIn;
+    let signedIn = false;
     let wrongKey = false;
     let authState ="signIn";
 
@@ -75,7 +75,8 @@
                         createDate: dayjs().format('MM-DD-YYYY')
                     })
                     // window.location.replace("https://www.gnote.app/home");
-                    goto('/home');
+                    authState = 'unset';
+                    signedIn = true;
                 })
                 .catch((error) => {
                     console.log(error.code);
@@ -177,6 +178,7 @@
                     Install App
                 </div>
             </div>
+            <p class="">Or if you're on iOS tap <img class="inline" src="ios-share.svg" alt="Share"> and select 'Add to Homescreen'</p>
         </div>
     {/if}
 </div>
