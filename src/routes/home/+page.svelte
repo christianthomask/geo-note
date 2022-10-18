@@ -208,6 +208,7 @@
     function signOutUser() {
         signOut(auth).then(() => {
             // Sign-out successful.
+            Cookies.set('authcookie', 'false')
             goto('/')
         }).catch((error) => {
             // An error happened.

@@ -37,6 +37,7 @@
         // console.log(key);
     })
 
+    // @TODO check if authcookie is a valid uid
     if(Cookies.get('authcookie') && Cookies.get('authcookie') !== 'false'){
         goto('/home');
     }
