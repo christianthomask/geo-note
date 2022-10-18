@@ -1,13 +1,22 @@
 <script>
+    import Cookies from 'js-cookie'
     import Map from "../../components/map.svelte"
     import { initializeApp } from "firebase/app";
     import {getDatabase, ref as fireRef, set, push, onValue, get, ref} from "firebase/database";
     import { getStorage, ref as storeRef, uploadBytes, getDownloadURL } from "firebase/storage";
     import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
     import { onMount } from 'svelte';
+    import { goto } from '$app/navigation'
     import { posts, feedState, cos } from "../../stores.js"
 
     let uid;
+    // export function load() {
+    //     console.log('run client')
+    //     let cookie = Cookies.get('authcookie')
+    //     if(cookie === 'false') {
+    //         goto('/')
+    //     }
+    // }
 
     let loc
     let lat = '0'
@@ -48,6 +57,10 @@
     let uiRejectMedia;
 
     onMount(() => {
+
+        document.getElementById('loadingSplash').classList.add('hidden');
+        uid = Cookies.get('authcookie');
+
         loc = window.navigator;
         uiLogo = document.getElementById('logo');
         uiCoS = document.getElementById('cos');
@@ -71,19 +84,6 @@
         uiRejectMedia = document.getElementById('rejectMedia');
         uiInitAnim(uiMenu);
         uiInitAnim(uiPin);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is signed in, see docs for a list of available properties
-                // https://firebase.google.com/docs/reference/js/firebase.User
-                uid = user.uid;
-                console.log(uid);
-                // ...
-            } else {
-                // User is signed out
-                window.location.replace("https://www.gnote.app");
-            }
-        });
 
         uiLogo.addEventListener("click", () => {
             location.reload();
@@ -187,8 +187,6 @@
     // Get a reference to the storage service, which is used to create references in your storage bucket
     const storage = getStorage();
 
-    // Create a storage reference from our storage service
-
 
     // let feedExpandedState = {state: 'feed', class:"h-1/2", width:"w-40"};
     // function togglePostState(state) {
@@ -210,7 +208,7 @@
     function signOutUser() {
         signOut(auth).then(() => {
             // Sign-out successful.
-            window.location.replace("https://www.gnote.app");
+            goto('/')
         }).catch((error) => {
             // An error happened.
             console.log(error);
@@ -501,7 +499,11 @@
     }
 
 </script>
+
 <div class="w-full max-w-3xl m-auto">
+    <div id="loadingSplash" class="absolute bg-gray-50 w-full h-full z-50 max-w-3xl flex justify-center items-center">
+        <p class="text-lg leading-7 font-extrabold text-gray-700">Loading...</p>
+    </div>
 
     <div class="w-full max-w-3xl h-screen fixed flex flex-col bg-white overflow-x-hidden">
 
@@ -533,34 +535,40 @@
             {#key $posts[currentPostId]}
                 {#if $posts[currentPostId]}
                     {#if $posts[currentPostId].videoPath}
-                        <div class="w-full h-fit flex pt-4 justify-center mb-4">
-                            <p class="absolute text-gray-100">Loading...</p>
-                            <div class="w-max h-max rounded-lg overflow-hidden relative">
-                                <video id="pinVideo" class="w-full h-full max-w-xs max-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
+                        <div class="w-full h-min flex pt-4 justify-center mb-4">
+                            <div class="w-full h-min flex absolute">
+                                <p class="text-gray-100">Loading...</p>
+                            </div>
+                            <div class="w-max h-min rounded-lg overflow-hidden relative">
+                                <video id="pinVideo" class="w-full h-full min-w-xs min-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
                             </div>
                         </div>
                     {/if}
                 {/if}
             {/key}
 
-            <div class="w-full max-w-sm h-fit flex flex-col mx-auto">
+            <div class="w-full max-w-xs justify-center h-fit flex flex-col mx-auto p-2 bg-yellow-50 rounded-lg">
 
                 <!--Poster-->
-                <div class="w-fit h-fit flex flex-col px-6 gap-2">
-                    <img src="yo.png" alt="Yo" class="w-16 h-16 rounded-full">
+                <div class="w-fit h-fit flex flex-row px-6 items-center gap-2">
                     {#if $posts[currentPostId]}
-                        <h2 class="text-lg leading-7 font-bold text-gray-700">{$posts[currentPostId].user}'s note:</h2>
+                        <div class="">
+                            <img src="yo.png" alt="Yo" class="w-16 h-16 rounded-full">
+                            <h2 class="text-lg leading-7 font-bold text-gray-700">{$posts[currentPostId].user}:</h2>
+                        </div>
+                        <div class="">
+                            <p class="text-xs text-gray-700">lat: {$posts[currentPostId].lat}</p>
+                            <p class="text-xs text-gray-700">lng: {$posts[currentPostId].lng}</p>
+                        </div>
                     {/if}
                 </div>
 
                 <!--postContent-->
                 <div class="w-full h-4/6 py-3 px-6">
                     {#if $posts[currentPostId]}
-                        <div class="w-fit h-max max-h-xs">
+                        <div class="w-full h-8">
                             <p class="text-lg-leading-7 font-medium text-gray-700 mb-2">{$posts[currentPostId].content}</p>
                         </div>
-                        <p class="text-lg-leading-7 font-medium text-gray-700">lat: {$posts[currentPostId].lat}</p>
-                        <p class="text-lg-leading-7 font-medium text-gray-700">lng: {$posts[currentPostId].lng}</p>
                     {/if}
                 </div>
 

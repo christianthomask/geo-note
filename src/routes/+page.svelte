@@ -1,6 +1,7 @@
 <script>
-
+    import Cookies from 'js-cookie'
     import { onMount } from 'svelte';
+    import { goto } from '$app/navigation'
     import { initializeApp } from "firebase/app";
     import {
         getAuth,
@@ -36,6 +37,20 @@
         // console.log(key);
     })
 
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            const uid = user.uid;
+            // window.location.replace("https://www.gnote.app/home");
+            Cookies.set('authcookie', uid )
+            // ...
+        } else {
+            // User is signed out
+            Cookies.set('authcookie', 'false' )
+        }
+    });
+
     let deferredPrompt;
 
     function createUser() {
@@ -54,7 +69,8 @@
                         password: password,
                         createDate: dayjs().format('MM-DD-YYYY')
                     })
-                    window.location.replace("https://www.gnote.app/home");
+                    // window.location.replace("https://www.gnote.app/home");
+                    goto('/home');
                 })
                 .catch((error) => {
                     console.log(error.code);
@@ -77,7 +93,8 @@
         const password = document.getElementById("password").value;
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            window.location.replace("https://www.gnote.app/home");
+            // window.location.replace("https://www.gnote.app/home");
+            goto('/home');
         })
         .catch((error) => {
             console.log(error.code);
@@ -104,18 +121,6 @@
 
         window.addEventListener('beforeinstallprompt', (e) => {
             deferredPrompt = e;
-        });
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is signed in, see docs for a list of available properties
-                // https://firebase.google.com/docs/reference/js/firebase.User
-                const uid = user.uid;
-                window.location.replace("https://www.gnote.app/home");
-                // ...
-            } else {
-                // User is signed out
-            }
         });
 
     });
