@@ -29,6 +29,7 @@
     let camera;
     let cameraMode = 'back';
     let currentStream
+    let captureStream;
     let mediaStream;
     let recorder;
     let recording = false;
@@ -320,7 +321,8 @@
         mediaStream.then(() => {
             uiHide(uiAddPinClose);
             recording = true;
-            startRecording(uiPreview.captureStream(), recordingTimeMS)
+
+            startRecording(recorder, recordingTimeMS)
                 .then((recordedChunks) => {
                     let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
                     currentRecording = recordedBlob;
@@ -349,6 +351,7 @@
         }).then((stream) => {
             currentStream = stream
             uiPreview.srcObject = currentStream;
+            recorder = new MediaRecorder(uiPreview.captureStream());
             if (!mediaStream) {
                 mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
             }
@@ -443,20 +446,19 @@
         return new Promise((resolve) => setTimeout(resolve, delay));
     }
 
-    function startRecording(stream, length) {
-        recorder = new MediaRecorder(stream);
+    function startRecording(rec, length) {
         let data = [];
-        recorder.ondataavailable = (event) => data.push(event.data);
-        recorder.start();
+        rec.ondataavailable = (event) => data.push(event.data);
+        rec.start();
 
         let stopped = new Promise((resolve, reject) => {
-            recorder.onstop = resolve;
-            recorder.onerror = (event) => reject(event.name);
+            rec.onstop = resolve;
+            rec.onerror = (event) => reject(event.name);
         });
 
         let recorded = wait(length).then(() => {
-                if (recorder.state === "recording") {
-                    recorder.stop();
+                if (rec.state === "recording") {
+                    rec.stop();
                     stopped.resolve();
                 }
             },
