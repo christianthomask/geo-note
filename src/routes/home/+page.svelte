@@ -369,7 +369,6 @@
             video: {
                 facingMode: 'environment'
             },
-            audio: true
         }).then((stream) => {
             currentStream = stream
             captureStream = uiPreview.captureStream()
