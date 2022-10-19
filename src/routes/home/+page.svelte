@@ -131,6 +131,10 @@
             uiRecording.src = "";
             uiHide(uiApproveMedia);
             uiHide(uiRecordMedia);
+            document.getElementById('finalPreview').src = URL.createObjectURL(currentRecording);
+            uiHide(uiAddMedia);
+            uiShow(document.getElementById('finalPreview'));
+            console.log(currentRecording)
         })
 
         uiRejectMedia.addEventListener("click", (event) => {
@@ -325,6 +329,7 @@
         uiShrink(uiPin);
         uiShrink(uiMenu);
         uiShow(uiPost);
+        uiShow(uiAddMedia)
     }
 
     function record() {
@@ -462,8 +467,15 @@
 
     function startRecording(rec, length) {
         let data = [];
+        if (rec.state === 'inactive') {
+            rec = new MediaRecorder(currentStream);
+            recorder = rec
+            rec.start();
+        }else if (rec.state === 'paused') {
+            rec.resume();
+        }
         rec.ondataavailable = (event) => data.push(event.data);
-        rec.start();
+
 
         let stopped = new Promise((resolve, reject) => {
             rec.onstop = resolve;
@@ -482,6 +494,7 @@
     }
 
     function stopRecording(stream) {
+        recorder.stop();
         stream.getTracks().forEach((track) => track.stop());
     }
 
@@ -549,8 +562,8 @@
         <div id="post" class="w-full max-w-3xl h-screen px-3 fixed flex flex-col z-20 bg-gray-50 hidden">
 
             <!--Media-->
-            {#key $posts[currentPostId]}
-                {#if $posts[currentPostId]}
+            {#if $posts[currentPostId]}
+                {#key $posts[currentPostId]}
                     {#if $posts[currentPostId].videoPath}
                         <div class="w-full h-min flex pt-4 justify-center mb-4">
                             <div class="w-full h-min flex absolute">
@@ -561,8 +574,8 @@
                             </div>
                         </div>
                     {/if}
-                {/if}
-            {/key}
+                {/key}
+            {/if}
 
             <div class="w-full max-w-xs justify-center h-fit flex flex-col mx-auto p-2 bg-yellow-50 rounded-lg">
 
@@ -609,26 +622,19 @@
             <div class="w-full h-2/4 pt-7 px-3 gap-6 flex flex-col items-center">
 
                 <!--Media-->
-                {#if !currentRecording}
 
-                    <!--addMedia-->
-                    <div class="flex flex-col items-center gap-2">
-                        <div id="addMedia" class="cursor-pointer w-16 h-16 rounded-full bg-gray-700 flex justify-center items-center" on:click={addMedia}>
-                            <img src="addMedia.svg" alt="Add Media">
-                        </div>
-                        <p class="text-lg leading-7 font-medium test-gray-700">Add a Photo or Video</p>
+                <!--addMedia-->
+                <div class="flex flex-col items-center gap-2">
+                    <div id="addMedia" class="cursor-pointer w-16 h-16 rounded-full bg-gray-700 flex justify-center items-center" on:click={addMedia}>
+                        <img src="addMedia.svg" alt="Add Media">
                     </div>
+                    <p class="text-lg leading-7 font-medium test-gray-700">Add a Photo or Video</p>
+                </div>
 
-                {/if}
-
-                {#if currentRecording}
-
-                    <!--finalPreview-->
-                    <div class="w-fit h-fit rounded-lg overflow-hidden relative">
-                        <video id="finalPreview" class="w-full h-full max-w-xs max-h-xs" src="{URL.createObjectURL(currentRecording)}" autoplay loop muted playsinline></video>
-                    </div>
-
-                {/if}
+                <!--finalPreview-->
+                <div class="w-fit h-fit rounded-lg overflow-hidden relative">
+                    <video id="finalPreview" class="w-full h-full max-w-xs max-h-xs" src="" autoplay loop muted playsinline></video>
+                </div>
 
                 <!--Contents-->
                 <div class="w-full h-fit flex flex-col items-center px-3 gap-6">
@@ -664,7 +670,7 @@
                 <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full" on:click={record}>
                     <img src="video.svg" alt="Take Video">
                 </div>
-                <div id="stopVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-red-500 rounded-full hidden" on:click={() => stopRecording(captureStream)}>
+                <div id="stopVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-red-500 rounded-full hidden" on:click={() => stopRecording(currentStream)}>
                     <img src="video.svg" alt="Take Video">
                 </div>
             </div>
