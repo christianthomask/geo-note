@@ -574,15 +574,15 @@
                         <div class="w-full h-min flex absolute">
                             <p class="text-gray-100">Loading...</p>
                         </div>
-                        <div class="w-max h-min rounded-lg overflow-hidden relative">
-                            <video id="pinVideo" class="w-full h-full min-w-xs min-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
+                        <div class="w-fit h-full max-w-xs max-h-80 rounded-lg overflow-hidden relative">
+                            <video id="pinVideo" class="w-full h-full" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
                         </div>
                     </div>
                 {/if}
             {/if}
 
 
-            <div class="w-full max-w-xs justify-center h-fit flex flex-col mx-auto p-2 bg-yellow-50 rounded-lg">
+            <div class="w-full max-w-xs justify-center h-fit flex flex-col mx-auto {$posts && $posts[currentPostId] && $posts[currentPostId].videoPath ? 'mt-2': 'mt-6'} py-6 px-2 bg-yellow-50 rounded-lg">
 
                 <!--Poster-->
                 <div class="w-fit h-fit flex flex-row px-6 items-center gap-2">
@@ -601,7 +601,7 @@
                 <!--postContent-->
                 <div class="w-full h-4/6 py-3 px-6">
                     {#if $posts && $posts[currentPostId]}
-                        <div class="w-full h-16 overflow-y-scroll">
+                        <div class="w-full h-24 overflow-y-scroll">
                             <p class="text-lg-leading-7 font-medium text-gray-700 mb-2">{$posts[currentPostId].content}</p>
                         </div>
                     {/if}
