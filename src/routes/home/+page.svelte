@@ -364,6 +364,7 @@
 
     function addMedia() {
         console.log('click')
+        uiShow(uiRecordMedia);
         camera = navigator.mediaDevices.getUserMedia({
             video: {
                 facingMode: 'environment'
@@ -378,8 +379,6 @@
             }
             recorder = new MediaRecorder(captureStream);
             mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
-
-            uiShow(uiRecordMedia);
         })
     }
 
