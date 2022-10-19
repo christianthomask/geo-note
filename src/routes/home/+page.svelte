@@ -571,9 +571,9 @@
             {#if $posts && $posts[currentPostId] !== undefined}
                 {#if $posts[currentPostId].videoPath}
                     <div class="w-full h-min flex pt-4 justify-center mb-4">
-                        <div class="w-full h-min flex absolute">
-                            <p class="text-gray-100">Loading...</p>
-                        </div>
+<!--                        <div class="w-full h-min flex absolute">-->
+<!--                            <p class="text-gray-100">Loading...</p>-->
+<!--                        </div>-->
                         <div class="w-fit h-full max-w-xs max-h-80 rounded-lg overflow-hidden relative">
                             <video id="pinVideo" class="w-full h-full" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
                         </div>
