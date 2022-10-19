@@ -93,6 +93,15 @@
             return false;
         })
 
+        const takeVideo = document.getElementById('takeVideo');
+        takeVideo.addEventListener('click', () => {
+            record();
+        })
+        const stopVideo = document.getElementById('stopVideo');
+        stopVideo.addEventListener('click', () => {
+            stopRecording(captureStream);
+        })
+
         uiPreview.addEventListener("click", (event) => {
             event.stopPropagation()
             if (cameraMode === 'front' && !recording) {
@@ -677,10 +686,10 @@
                     <img src="camera.svg" alt="Take Picture">
                     <img src="disabled.svg" alt="Disabled" class="absolute">
                 </div>
-                <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full" on:click={record}>
+                <div id="takeVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-gray-700 rounded-full">
                     <img src="video.svg" alt="Take Video">
                 </div>
-                <div id="stopVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-red-500 rounded-full hidden" on:click={() => stopRecording(currentStream)}>
+                <div id="stopVideo" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-red-500 rounded-full hidden">
                     <img src="video.svg" alt="Take Video">
                 </div>
             </div>
