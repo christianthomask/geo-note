@@ -342,7 +342,7 @@
             uiHide(uiAddPinClose);
             uiHide(document.getElementById('takeVideo'))
             uiShow(document.getElementById('stopVideo'))
-            startRecording(recorder, recordingTimeMS)
+            startRecording(recordingTimeMS)
                 .then((recordedChunks) => {
                     let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
                     currentRecording = recordedBlob;
@@ -477,6 +477,8 @@
         //     rec.resume();
         // }
         let rec = new MediaRecorder(captureStream);
+        recorder = rec;
+        rec.start();
         rec.ondataavailable = (event) => data.push(event.data);
 
 
@@ -497,7 +499,10 @@
     }
 
     function stopRecording(stream) {
-        recorder.stop();
+        // recorder.stop();
+        uiHide(document.getElementById('stopVideo'))
+        uiShow(document.getElementById('takeVideo'))
+        recorder.stop()
         stream.getTracks().forEach((track) => track.stop());
     }
 
