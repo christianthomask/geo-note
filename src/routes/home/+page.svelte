@@ -35,6 +35,8 @@
     let recording = false;
     let recordingTimeMS = 5000;
 
+    let pinUser = 'Blank';
+
     let uiLogo;
     let uiCoS;
     let uiMenu;
@@ -257,36 +259,38 @@
                 get(ref(db, 'users/' + uid)).then((snapshot) => {
                     let usr = snapshot.val();
                     username = usr.username
+                    // console.log(username)
+                }).then(() => {
+                    if (!currentRecording) {
+                        set(newPostRef, {
+                            user: username,
+                            lat: lat,
+                            lng: lng,
+                            content: postContents
+                        });
+                    } else if (currentRecording) {
+                        console.log(newPostRef._path.pieces_[1]);
+                        let storageId = storeRef(storage, "/videos/" + newPostRef._path.pieces_[1])
+                        uploadBytes(storageId, currentRecording).then((snapshot) => {
+                            console.log('Uploaded a blob or file!');
+                        }).then(() => {
+                            getDownloadURL(storageId)
+                                .then((url => {
+                                    get(ref(db, 'users/' + uid)).then((snapshot) => {
+                                        let usr = snapshot.val();
+                                        username = usr.username
+                                    })
+                                    set(newPostRef, {
+                                        user: username,
+                                        lat: lat,
+                                        lng: lng,
+                                        content: postContents,
+                                        videoPath: url
+                                    });
+                                }))
+                        })
+                    }
                 })
-                if (!currentRecording) {
-                    set(newPostRef, {
-                        user: username,
-                        lat: lat,
-                        lng: lng,
-                        content: postContents
-                    });
-                } else if (currentRecording) {
-                    console.log(newPostRef._path.pieces_[1]);
-                    let storageId = storeRef(storage, "/videos/" + newPostRef._path.pieces_[1])
-                    uploadBytes(storageId, currentRecording).then((snapshot) => {
-                        console.log('Uploaded a blob or file!');
-                    }).then(() => {
-                        getDownloadURL(storageId)
-                            .then((url => {
-                                get(ref(db, 'users/' + uid)).then((snapshot) => {
-                                    let usr = snapshot.val();
-                                    username = usr.username
-                                })
-                                set(newPostRef, {
-                                    user: username,
-                                    lat: lat,
-                                    lng: lng,
-                                    content: postContents,
-                                    videoPath: url
-                                });
-                            }))
-                    })
-                }
                 if(document.getElementById('pinVideo')) {
                     document.getElementById('pinVideo').src = "";
                 }
@@ -301,6 +305,7 @@
 
     function openPost(id) {
         currentPostId = id;
+        pinUser = $posts[currentPostId].user
         uiShrink(uiMenu);
         uiShrink(uiPin);
         uiShow(uiPost);
@@ -562,29 +567,29 @@
         <div id="post" class="w-full max-w-3xl h-screen px-3 fixed flex flex-col z-20 bg-gray-50 hidden">
 
             <!--Media-->
-            {#if $posts[currentPostId]}
-                {#key $posts[currentPostId]}
-                    {#if $posts[currentPostId].videoPath}
-                        <div class="w-full h-min flex pt-4 justify-center mb-4">
-                            <div class="w-full h-min flex absolute">
-                                <p class="text-gray-100">Loading...</p>
-                            </div>
-                            <div class="w-max h-min rounded-lg overflow-hidden relative">
-                                <video id="pinVideo" class="w-full h-full min-w-xs min-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
-                            </div>
+
+            {#if $posts && $posts[currentPostId] !== undefined}
+                {#if $posts[currentPostId].videoPath}
+                    <div class="w-full h-min flex pt-4 justify-center mb-4">
+                        <div class="w-full h-min flex absolute">
+                            <p class="text-gray-100">Loading...</p>
                         </div>
-                    {/if}
-                {/key}
+                        <div class="w-max h-min rounded-lg overflow-hidden relative">
+                            <video id="pinVideo" class="w-full h-full min-w-xs min-h-xs" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
+                        </div>
+                    </div>
+                {/if}
             {/if}
+
 
             <div class="w-full max-w-xs justify-center h-fit flex flex-col mx-auto p-2 bg-yellow-50 rounded-lg">
 
                 <!--Poster-->
                 <div class="w-fit h-fit flex flex-row px-6 items-center gap-2">
-                    {#if $posts[currentPostId]}
+                    {#if $posts && $posts[currentPostId]}
                         <div class="">
                             <img src="yo.png" alt="Yo" class="w-16 h-16 rounded-full">
-                            <h2 class="text-lg leading-7 font-bold text-gray-700">{$posts[currentPostId].user}:</h2>
+                            <h2 id="pinUser" class="text-lg leading-7 font-bold text-gray-700">{pinUser}:</h2>
                         </div>
                         <div class="">
                             <p class="text-xs text-gray-700">lat: {$posts[currentPostId].lat}</p>
@@ -595,7 +600,7 @@
 
                 <!--postContent-->
                 <div class="w-full h-4/6 py-3 px-6">
-                    {#if $posts[currentPostId]}
+                    {#if $posts && $posts[currentPostId]}
                         <div class="w-full h-16 overflow-y-scroll">
                             <p class="text-lg-leading-7 font-medium text-gray-700 mb-2">{$posts[currentPostId].content}</p>
                         </div>
