@@ -5,7 +5,7 @@ import { redirect } from '@sveltejs/kit'
 export function load() {
     console.log('run')
     const authCookie = Cookies.get('authcookie')
-        if(authCookie !== 'false'){
+        if(authCookie && authCookie !== 'false'){
             return
         }
     throw redirect(307, '/')
