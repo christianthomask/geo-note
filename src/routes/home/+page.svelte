@@ -25,7 +25,7 @@
     // let localPosts = {};
     posts.set({id: {loading: true}})
 
-    let currentRecording;
+    let currentRecording = null;
     let camera;
     let cameraMode = 'back';
     let currentStream
@@ -261,14 +261,14 @@
                     username = usr.username
                     // console.log(username)
                 }).then(() => {
-                    if (!currentRecording) {
+                    if (currentRecording === null) {
                         set(newPostRef, {
                             user: username,
                             lat: lat,
                             lng: lng,
                             content: postContents
                         });
-                    } else if (currentRecording) {
+                    } else if (currentRecording !== null) {
                         console.log(newPostRef._path.pieces_[1]);
                         let storageId = storeRef(storage, "/videos/" + newPostRef._path.pieces_[1])
                         uploadBytes(storageId, currentRecording).then((snapshot) => {
@@ -657,9 +657,11 @@
         </div>
 
         <!--addPinClose-->
-        <div id="addPinClose" class="cursor-pointer z-50 w-28 h-28 flex justify-center items-center bg-gray-300 absolute top-0 right-0 rounded-tl-full rounded-bl-full rounded-br-full scale-0 origin-top-right ease-springy" on:click={exitPin}>
-            <img src="close.svg" alt="Close">
-        </div>
+        {#if !posting}
+            <div id="addPinClose" class="cursor-pointer z-50 w-28 h-28 flex justify-center items-center bg-gray-300 absolute top-0 right-0 rounded-tl-full rounded-bl-full rounded-br-full scale-0 origin-top-right ease-springy" on:click={exitPin}>
+                <img src="close.svg" alt="Close">
+            </div>
+        {/if}
 
         <!--recordMedia-->
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
@@ -700,7 +702,7 @@
         <Map />
 
         {#if posting}
-            <div class="absolute z-100 top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
+            <div class="absolute z-50 top-0 left-0 w-full h-full bg-slate-500/50 flex items-center justify-center">
                 <p class="text-white">Posting...</p>
             </div>
         {/if}
