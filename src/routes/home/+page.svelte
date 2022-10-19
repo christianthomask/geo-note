@@ -374,6 +374,7 @@
             currentStream = stream
             captureStream = uiPreview.captureStream()
             uiPreview.srcObject = currentStream;
+            uiPreview.play()
             if(recorder && recorder.state === 'recording') {
                 recorder.stop()
             }
@@ -666,7 +667,7 @@
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
             <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
             <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
-                <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted playsinline></video>
+                <video id="preview" class="w-full h-full max-w-xs max-h-xs"muted playsinline></video>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="takePicture" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
