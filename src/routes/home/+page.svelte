@@ -104,10 +104,10 @@
                     audio: true
                 }).then((stream) => {
                     currentStream = stream;
-                    if(recorder && recorder.state === 'recording') {
-                        recorder.stop()
-                    }
-                    recorder = new MediaRecorder(captureStream);
+                    // if(recorder && recorder.state === 'recording') {
+                    //     recorder.stop()
+                    // }
+                    // // recorder = new MediaRecorder(captureStream);
                     uiPreview.srcObject = currentStream;
                 })
             } else if(cameraMode === 'back' && !recording) {
@@ -119,10 +119,10 @@
                     audio: true
                 }).then((stream) => {
                     currentStream = stream;
-                    if(recorder && recorder.state === 'recording') {
-                        recorder.stop()
-                    }
-                    recorder = new MediaRecorder(captureStream);
+                    // if(recorder && recorder.state === 'recording') {
+                    //     recorder.stop()
+                    // }
+                    // recorder = new MediaRecorder(captureStream);
                     uiPreview.srcObject = currentStream;
                 })
             }
@@ -148,10 +148,10 @@
                 audio: true
             }).then((stream) => {
                 currentStream = stream
-                if(recorder && recorder.state === 'recording') {
-                    recorder.stop()
-                }
-                recorder = new MediaRecorder(captureStream);
+                // if(recorder && recorder.state === 'recording') {
+                //     recorder.stop()
+                // }
+                // recorder = new MediaRecorder(captureStream);
                 uiPreview.srcObject = currentStream;
                 mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
             })
@@ -371,13 +371,11 @@
             },
         }).then((stream) => {
             currentStream = stream
-            captureStream = uiPreview.captureStream()
             uiPreview.srcObject = currentStream;
-            uiPreview.play()
-            if(recorder && recorder.state === 'recording') {
-                recorder.stop()
-            }
-            recorder = new MediaRecorder(captureStream);
+            captureStream = uiPreview.captureStream()
+            // if(recorder && recorder.state === 'recording') {
+            //     recorder.stop()
+            // }
             mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
         })
     }
@@ -469,15 +467,16 @@
         return new Promise((resolve) => setTimeout(resolve, delay));
     }
 
-    function startRecording(rec, length) {
+    function startRecording(length) {
         let data = [];
-        if (rec.state === 'inactive') {
-            rec = new MediaRecorder(currentStream);
-            recorder = rec
-            rec.start();
-        }else if (rec.state === 'paused') {
-            rec.resume();
-        }
+        // if (rec.state === 'inactive') {
+        //     rec = new MediaRecorder(currentStream);
+        //     recorder = rec
+        //     rec.start();
+        // }else if (rec.state === 'paused') {
+        //     rec.resume();
+        // }
+        let rec = new MediaRecorder(captureStream);
         rec.ondataavailable = (event) => data.push(event.data);
 
 
@@ -666,7 +665,7 @@
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
             <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
             <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
-                <video id="preview" class="w-full h-full max-w-xs max-h-xs"muted playsinline></video>
+                <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted playsinline></video>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="takePicture" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
