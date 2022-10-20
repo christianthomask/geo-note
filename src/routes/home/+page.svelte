@@ -28,6 +28,9 @@
     let currentRecording = null;
     let camera;
     let cameraMode = 'back';
+    let canvas;
+    let ctx;
+    let canvasStart = false;
     let currentStream
     let captureStream;
     let mediaStream;
@@ -63,6 +66,18 @@
 
         document.getElementById('loadingSplash').classList.add('hidden');
         uid = Cookies.get('authcookie');
+
+        console.log('canvas start')
+        let request;
+        let video = document.getElementById('preview')
+        const renderVideo = () => {
+            request = requestAnimationFrame(renderVideo)
+            console.log('drawing')
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
+        video.addEventListener('play', () => {
+            renderVideo();
+        })
 
         loc = window.navigator;
         uiLogo = document.getElementById('logo');
@@ -378,14 +393,19 @@
             video: {
                 facingMode: 'environment'
             },
+            audio: true
         }).then((stream) => {
             currentStream = stream
             uiPreview.srcObject = currentStream;
-            captureStream = uiPreview.captureStream()
             // if(recorder && recorder.state === 'recording') {
             //     recorder.stop()
             // }
             mediaStream = new Promise((resolve) => uiPreview.onplaying = resolve);
+            canvas = document.getElementById('previewCanvas');
+            ctx = canvas.getContext('2d');
+            captureStream = canvas.captureStream()
+            canvasStart = true;
+            console.log(canvasStart)
         })
     }
 
@@ -649,8 +669,8 @@
                 </div>
 
                 <!--finalPreview-->
-                <div class="w-fit h-fit rounded-lg overflow-hidden relative">
-                    <video id="finalPreview" class="w-full h-full max-w-xs max-h-xs" src="" autoplay loop muted playsinline></video>
+                <div class="w-48 h-48 rounded-lg overflow-hidden relative">
+                    <video id="finalPreview" class="w-48 h-48 max-w-xs max-h-xs" src="" autoplay loop muted playsinline></video>
                 </div>
 
                 <!--Contents-->
@@ -678,8 +698,9 @@
         <!--recordMedia-->
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
             <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
-            <div id="videoFrame" class="w-fit h-fit rounded-lg overflow-hidden relative">
-                <video id="preview" class="w-full h-full max-w-xs max-h-xs" autoplay muted playsinline></video>
+            <div id="videoFrame" class="w-48 h-48 rounded-lg overflow-hidden relative">
+                <video id="preview" class="w-full h-full object-cover relative z-30" autoplay muted playsinline></video>
+                <canvas id="previewCanvas" class="w-48 h-48 object-cover absolute top-0 z-0"></canvas>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="takePicture" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
@@ -697,8 +718,8 @@
 
         <!--approveMedia-->
         <div id="approveMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-40 bg-gray-50 hidden">
-            <div class="w-fit h-fit rounded-lg overflow-hidden relative">
-                <video id="recording" class="w-full h-full max-w-xs max-h-xs" autoplay loop playsinline></video>
+            <div class="w-48 h-48 rounded-lg overflow-hidden relative">
+                <video id="recording" class="w-48 h-48" autoplay loop playsinline></video>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="rejectMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
