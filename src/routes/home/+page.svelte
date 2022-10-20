@@ -117,7 +117,7 @@
             stopRecording(captureStream);
         })
 
-        uiPreview.addEventListener("click", (event) => {
+        document.getElementById('previewCanvas').addEventListener("click", (event) => {
             event.stopPropagation()
             if (cameraMode === 'front' && !recording) {
                 cameraMode = 'back';
