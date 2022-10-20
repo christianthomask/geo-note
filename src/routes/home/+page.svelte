@@ -696,8 +696,8 @@
         <div id="recordMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-30 bg-gray-50 hidden">
             <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
             <div id="videoFrame" class="w-48 h-48 rounded-lg overflow-hidden relative">
-                <video id="preview" class="w-full h-full object-cover relative z-30" autoplay muted playsinline></video>
-                <canvas id="previewCanvas" class="w-full h-full object-cover absolute top-0 z-0"></canvas>
+                <video id="preview" class="w-full h-full object-cover relative z-0" autoplay muted playsinline></video>
+                <canvas id="previewCanvas" class="w-full h-full object-cover absolute top-0 z-30"></canvas>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="takePicture" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
