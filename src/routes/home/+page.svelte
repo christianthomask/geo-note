@@ -606,8 +606,8 @@
 <!--                        <div class="w-full h-min flex absolute">-->
 <!--                            <p class="text-gray-100">Loading...</p>-->
 <!--                        </div>-->
-                        <div class="w-fit h-full max-w-xs max-h-80 rounded-lg overflow-hidden relative">
-                            <video id="pinVideo" class="w-full h-full" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
+                        <div class="w-48 h-48 max-w-xs max-h-80 rounded-lg overflow-hidden relative">
+                            <video id="pinVideo" class="w-full h-full object-cover" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
                         </div>
                     </div>
                 {/if}
@@ -670,7 +670,7 @@
 
                 <!--finalPreview-->
                 <div class="w-48 h-48 rounded-lg overflow-hidden relative">
-                    <video id="finalPreview" class="w-48 h-48 max-w-xs max-h-xs" src="" autoplay loop muted playsinline></video>
+                    <video id="finalPreview" class="w-full h-full object-cover" src="" autoplay loop muted playsinline></video>
                 </div>
 
                 <!--Contents-->
@@ -700,7 +700,7 @@
             <h2 class="text-lg leading-7 font-bold">Tap video to switch cameras</h2>
             <div id="videoFrame" class="w-48 h-48 rounded-lg overflow-hidden relative">
                 <video id="preview" class="w-full h-full object-cover relative z-30" autoplay muted playsinline></video>
-                <canvas id="previewCanvas" class="w-48 h-48 object-cover absolute top-0 z-0"></canvas>
+                <canvas id="previewCanvas" class="w-full h-full object-cover absolute top-0 z-0"></canvas>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="takePicture" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
@@ -719,7 +719,7 @@
         <!--approveMedia-->
         <div id="approveMedia" class="w-full max-w-3xl h-screen fixed flex flex-col justify-center items-center gap-y-6 z-40 bg-gray-50 hidden">
             <div class="w-48 h-48 rounded-lg overflow-hidden relative">
-                <video id="recording" class="w-48 h-48" autoplay loop playsinline></video>
+                <video id="recording" class="w-full h-full object-cover" autoplay loop playsinline></video>
             </div>
             <div class="w-fit h-fit flex gap-x-6">
                 <div id="rejectMedia" class="cursor-pointer w-28 h-28 flex justify-center items-center bg-yellow-300 rounded-full">
