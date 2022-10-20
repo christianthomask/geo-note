@@ -498,27 +498,23 @@
 
     function startRecording(length) {
         let data = [];
-        // if (rec.state === 'inactive') {
-        //     rec = new MediaRecorder(currentStream);
-        //     recorder = rec
-        //     rec.start();
-        // }else if (rec.state === 'paused') {
-        //     rec.resume();
-        // }
-        let rec = new MediaRecorder(captureStream);
-        recorder = rec;
-        rec.start();
-        rec.ondataavailable = (event) => data.push(event.data);
+        if (!recorder) {
+            recorder = new MediaRecorder(captureStream);
+            recorder.start();
+        }else if (recorder.state === 'paused') {
+            recorder.resume();
+        }recorder
+        recorder.ondataavailable = (event) => data.push(event.data);
 
 
         let stopped = new Promise((resolve, reject) => {
-            rec.onstop = resolve;
-            rec.onerror = (event) => reject(event.name);
+            recorder.onstop = resolve;
+            recorder.onerror = (event) => reject(event.name);
         });
 
         let recorded = wait(length).then(() => {
-                if (rec.state === "recording") {
-                    rec.stop();
+                if (recorder.state === "recording") {
+                    recorder.stop();
                     stopped.resolve();
                 }
             },
@@ -532,7 +528,8 @@
         uiHide(document.getElementById('stopVideo'))
         uiShow(document.getElementById('takeVideo'))
         recorder.stop()
-        stream.getTracks().forEach((track) => track.stop());
+        recorder = null;
+        // stream.getTracks().forEach((track) => track.stop());
     }
 
     onMount(() => {
