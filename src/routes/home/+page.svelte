@@ -327,12 +327,13 @@
             })
     }
 
-    function openPost(id) {
+    async function openPost(id) {
         currentPostId = id;
         pinUser = $posts[currentPostId].user
         uiShrink(uiMenu);
         uiShrink(uiPin);
-        uiShow(uiPost);
+        await uiShow(uiPost);
+        document.getElementById('pinVideo').src = $posts[currentPostId].videoPath;
         // togglePostState('post')
         if ($feedState !== 'unset') {
             feedState.set('unset');
@@ -604,7 +605,7 @@
 <!--                            <p class="text-gray-100">Loading...</p>-->
 <!--                        </div>-->
                         <div class="w-48 h-48 max-w-xs max-h-80 rounded-lg overflow-hidden relative">
-                            <video id="pinVideo" class="w-full h-full object-cover" src="{$posts[currentPostId].videoPath}" autoplay loop playsinline></video>
+                            <video id="pinVideo" class="w-full h-full object-cover" src="" autoplay loop playsinline></video>
                         </div>
                     </div>
                 {/if}
