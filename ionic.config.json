@@ -1,0 +1,7 @@
+{
+  "name": "geo-note",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
