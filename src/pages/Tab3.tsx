@@ -19,7 +19,7 @@ import ExploreContainer from '../components/ExploreContainer';
 import './Tab3.css';
 
 const Tab3: React.FC = () => {
-    const { takePhoto } = usePhotoGallery();
+    const { photos, takePhoto } = usePhotoGallery();
   return (
     <IonPage>
       <IonHeader>
@@ -33,15 +33,21 @@ const Tab3: React.FC = () => {
             <IonTitle size="large">Tab 3</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="Tab 3 page" />
+          <IonGrid>
+              <IonRow>
+                  {photos.map((photo, index) => (
+                      <IonCol size="6" key={photo.filepath}>
+                          <IonImg src={photo.webviewPath} />
+                      </IonCol>
+                  ))}
+              </IonRow>
+          </IonGrid>
+          <IonFab vertical="bottom" horizontal="center" slot="fixed">
+              <IonFabButton onClick={() => takePhoto()}>
+                  <IonIcon icon={camera}></IonIcon>
+              </IonFabButton>
+          </IonFab>
       </IonContent>
-        <IonContent>
-            <IonFab vertical="bottom" horizontal="center" slot="fixed">
-                <IonFabButton onClick={() => takePhoto()}>
-                    <IonIcon icon={camera}></IonIcon>
-                </IonFabButton>
-            </IonFab>
-        </IonContent>
     </IonPage>
   );
 };
