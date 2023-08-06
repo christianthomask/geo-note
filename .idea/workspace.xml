@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2fcfa4c6-f3da-4fe8-9650-9f939e3a7281" name="Changes" comment="Added test photo gallery">
+      <change beforePath="$PROJECT_DIR$/.browserslistrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.eslintrc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/extensions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/capacitor.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress/e2e/test.cy.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress/fixtures/example.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress/support/commands.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress/support/e2e.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/focus-visible-9c13edeb.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/focus-visible-legacy-b3e947fe.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/hardware-back-button-77fd2980.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/hardware-back-button-legacy-7391e573.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/index-1d8ad985.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/index-5f0aa701.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/index-legacy-5e09bfad.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/index9-56be426d.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/index9-legacy-539ca5e7.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/input-shims-4f89b74e.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/input-shims-legacy-657a72b4.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/ios.transition-23370de9.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/ios.transition-legacy-38fea9c4.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/keyboard2-ac2b7e73.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/keyboard2-legacy-53bf0193.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/md.transition-dd7bf1c2.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/md.transition-legacy-2dd9451e.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/polyfills-legacy-868bd420.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-action-sheet.entry-5b61fbdf.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-action-sheet.entry-legacy-ac14f5d8.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-camera-modal-instance.entry-b52f64fb.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-camera-modal-instance.entry-legacy-0f581ff3.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-camera-modal.entry-f16ca8d6.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-camera-modal.entry-legacy-029f0fd4.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-camera.entry-eb85899b.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-camera.entry-legacy-d7cd342b.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-toast.entry-e733b05c.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/pwa-toast.entry-legacy-105ec838.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/status-tap-59141006.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/status-tap-legacy-e62d7869.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/swipe-back-d377ff9c.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/assets/swipe-back-legacy-839c783c.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ionic.config.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.test.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ExploreContainer.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ExploreContainer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/usePhotoGallery.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Tab1.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Tab1.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Tab2.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Tab2.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Tab3.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Tab3.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/setupTests.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/theme/variables.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vite-env.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.node.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="master" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2TUn3Sl92YBUUk07ahB4zAmyFSw" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/Users/christiankock/capacitor/geo-note",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/Users/christiankock/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/231.9225.16/IntelliJ IDEA.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2fcfa4c6-f3da-4fe8-9650-9f939e3a7281" name="Changes" comment="" />
+      <created>1691106327435</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1691106327435</updated>
+      <workItem from="1691106328435" duration="1562000" />
+      <workItem from="1691208162910" duration="4132000" />
+    </task>
+    <task id="LOCAL-00001" summary="migrated to capacitor">
+      <option name="closed" value="true" />
+      <created>1691106474118</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1691106474118</updated>
+    </task>
+    <task id="LOCAL-00002" summary="migrated to capacitor p2">
+      <option name="closed" value="true" />
+      <created>1691106492158</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1691106492158</updated>
+    </task>
+    <task id="LOCAL-00003" summary="re-arranged directory structure">
+      <option name="closed" value="true" />
+      <created>1691106728260</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1691106728260</updated>
+    </task>
+    <task id="LOCAL-00004" summary="test vercel build">
+      <option name="closed" value="true" />
+      <created>1691109339213</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1691109339213</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Added test camera and dependencies">
+      <option name="closed" value="true" />
+      <created>1691209771580</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1691209771580</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added test photo gallery">
+      <option name="closed" value="true" />
+      <created>1691210351389</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1691210351389</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="migrated to capacitor" />
+    <MESSAGE value="migrated to capacitor p2" />
+    <MESSAGE value="re-arranged directory structure" />
+    <MESSAGE value="test vercel build" />
+    <MESSAGE value="Added test camera and dependencies" />
+    <MESSAGE value="Added test photo gallery" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added test photo gallery" />
+  </component>
+</project>
